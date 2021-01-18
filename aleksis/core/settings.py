@@ -102,6 +102,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "invitations",
     "health_check",
     "health_check.db",
     "health_check.cache",
@@ -276,6 +277,16 @@ ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
 
 # Enforce uniqueness of email addresses
 ACCOUNT_UNIQUE_EMAIL = _settings.get("auth.login.registration.unique_email", True)
+
+# Configuration for django-invitations
+
+ACCOUNT_ADAPTER = "invitations.models.InvitationsAdapter"
+
+INVITATIONS_INVITATION_EXPIRY = _settings.get("auth.invitation.expiry", 3)
+
+INVITATIONS_INVITATION_ONLY = _settings.get("auth.invitation.invite_only", True)
+
+INVITATIONS_EMAIL_SUBJECT_PREFIX = ACCOUNT_EMAIL_SUBJECT_PREFIX
 
 # LDAP config
 
