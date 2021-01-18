@@ -732,6 +732,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "django-invitations"
+version = "1.9.3"
+description = "Generic invitations app with support for django-allauth"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "django-ipware"
 version = "3.0.2"
 description = "A Django utility application that returns client's real IP address"
@@ -2325,7 +2333,7 @@ ldap = ["django-auth-ldap"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "d21792f362c1edd547f0dffee9f2ba23aeb0f22e544e735ab84b40b2fad10a0e"
+content-hash = "03092efc272a217525e73387d0aa117c1aaa9fd621f3fb2af0867a348c9b6197"
 
 [metadata.files]
 alabaster = [
@@ -2643,6 +2651,9 @@ django-health-check = [
 ]
 django-impersonate = [
     {file = "django-impersonate-1.7.2.tar.gz", hash = "sha256:ef1f9fa3180f4d95db0abbca3403f389e901e0beb781afd0db0edface72d148d"},
+]
+django-invitations = [
+    {file = "django-invitations-1.9.3.tar.gz", hash = "sha256:6077807aa641c7abae9ca418e757c8e3940fb0ce60499dba24c100ad57c61442"},
 ]
 django-ipware = [
     {file = "django-ipware-3.0.2.tar.gz", hash = "sha256:c7df8e1410a8e5d6b1fbae58728402ea59950f043c3582e033e866f0f0cf5e94"},
