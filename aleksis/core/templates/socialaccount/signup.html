@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+
+{% load i18n material_form %}
+
+{% block browser_title %}{% trans "Signup" %}{% endblock %}
+{% block page_title %}{% trans "Signup" %}{% endblock %}
+
+{% block content %}
+  <div class="alert success">
+    <p>
+      <i class="material-icons left">check_circle_outline</i>
+        {% blocktrans with provider_name=account.get_provider.name site_name=site.name %}You are about to use your {{provider_name}} account to login to
+        {{site_name}}. As a final step, please complete the following form:{% endblocktrans %}
+    </p>
+  </div>
+
+  <form method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {% form form=form %}{% endform %}
+    {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    {% trans "Sign up" as caption %}
+    {% include "core/partials/save_button.html" with caption=caption icon="how_to_reg" %}
+  </form>
+
+{% endblock %}

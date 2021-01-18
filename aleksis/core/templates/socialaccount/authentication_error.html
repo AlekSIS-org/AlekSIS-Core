@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+
+{% load i18n material_form %}
+
+{% block browser_title %}{% trans "Social Network Login Failure" %}{% endblock %}
+{% block page_title %}{% trans "Social Network Login Failure" %}{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="card red">
+      <div class="card-content white-text">
+        <div class="material-icons small left">error_outline</div>
+        <span class="card-title">{% blocktrans %}Social Network Login Failure.{% endblocktrans %}</span>
+        <p>
+          {% blocktrans %}
+            An error occurred while attempting to login via your social network account.
+            Please contact one of your site administrators.
+          {% endblocktrans %}
+        </p>
+        {% include "core/partials/admins_list.html" %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

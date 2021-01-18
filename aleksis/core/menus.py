@@ -70,6 +70,15 @@ MENUS = {
                         "aleksis.core.util.core_helpers.has_person",
                     ],
                 },
+                {
+                    "name": _("Social accounts"),
+                    "url": "socialaccount_connections",
+                    "icon": "globe",
+                    "validators": [
+                        "menu_generator.validators.is_authenticated",
+                        "aleksis.core.util.core_helpers.has_person",
+                    ],
+                },
             ],
         },
         {
