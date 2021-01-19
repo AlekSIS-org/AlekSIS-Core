@@ -13,9 +13,9 @@ MENUS = {
             "name": _("Sign up"),
             "url": "account_signup",
             "icon": "how_to_reg",
-            "validators":
-            ["menu_generator.validators.is_anonymous",
-            ("aleksis.core.util.predicates.permission_validator", "core.can_register"),
+            "validators": [
+                "menu_generator.validators.is_anonymous",
+                ("aleksis.core.util.predicates.permission_validator", "core.can_register"),
             ],
         },
         {
