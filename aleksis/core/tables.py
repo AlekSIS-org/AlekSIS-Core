@@ -5,6 +5,7 @@ from django_tables2.utils import A
 
 from aleksis.core.models import Person
 
+
 class SchoolTermTable(tables.Table):
     """Table to list persons."""
 
@@ -110,4 +111,6 @@ class InvitationsTable(tables.Table):
     email = tables.EmailColumn()
     sent = tables.DateColumn()
     inviter_id = PersonColumn()
-    accepted = tables.BooleanColumn(yesno="check,cancel", attrs={"span": {"class": "material-icons"}})
+    accepted = tables.BooleanColumn(
+        yesno="check,cancel", attrs={"span": {"class": "material-icons"}}
+    )
