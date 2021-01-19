@@ -25,6 +25,8 @@ from haystack.inputs import AutoQuery
 from haystack.query import SearchQuerySet
 from haystack.views import SearchView
 from health_check.views import MainView
+from invitations.models import Invitation
+from invitations.views import SendInvite
 from reversion import set_user
 from reversion.views import RevisionMixin
 from rules.contrib.views import PermissionRequiredMixin, permission_required
@@ -69,6 +71,7 @@ from .tables import (
     DashboardWidgetTable,
     GroupsTable,
     GroupTypesTable,
+    InvitationsTable,
     PersonsTable,
     SchoolTermTable,
 )
@@ -923,3 +926,13 @@ class EditDashboardView(View):
         context = self.get_context_data(request, **kwargs)
 
         return render(request, "core/edit_dashboard.html", context=context)
+
+
+class InvitePerson(PermissionRequiredMixin, SendInvite, SingleTableView):
+    """View to invite a person to register an account."""
+
+    template_name = "invitations/forms/_invite.html"
+    permission_required = "core.can_invite"
+    model = Invitation
+    table_class = InvitationsTable
+    context = {}

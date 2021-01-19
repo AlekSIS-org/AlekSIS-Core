@@ -1,0 +1,24 @@
+{# -*- engine:django -*- #}
+
+{% extends "core/base.html" %}
+
+{% load material_form i18n %}
+
+{% load render_table from django_tables2 %}
+
+{% block browser_title %}{% blocktrans %}Invite{% endblocktrans %}{% endblock %}
+{% block page_title %}{% blocktrans %}Invite{% endblocktrans %}{% endblock %}
+
+
+{% block content %}
+
+  <form method="post">
+    {% csrf_token %}
+    {% form form=form %}{% endform %}
+    {% trans "Invite" as caption %}
+    {% include "core/partials/save_button.html" with caption=caption icon="card_giftcard" %}
+  </form>
+
+  {% render_table table %}
+
+{% endblock %}

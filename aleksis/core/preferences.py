@@ -211,6 +211,14 @@ class SignupEnabled(BooleanPreference):
 
 
 @site_preferences_registry.register
+class InviteEnabled(BooleanPreference):
+    section = auth
+    name = "invite_enabled"
+    default = False
+    verbose_name = _("Enable invitations")
+
+
+@site_preferences_registry.register
 class AvailableLanguages(MultipleChoicePreference):
     section = internationalisation
     name = "languages"

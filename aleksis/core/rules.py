@@ -314,3 +314,7 @@ rules.add_perm("core.edit_default_dashboard", edit_default_dashboard_predicate)
 # django-allauth
 can_register_predicate = is_site_preference_set(section="auth", pref="signup_enabled")
 rules.add_perm("core.can_register", can_register_predicate)
+
+# django-invitations
+can_invite_predicate = is_site_preference_set(section="auth", pref="invite_enabled")
+rules.add_perm("core.can_invite", can_invite_predicate)

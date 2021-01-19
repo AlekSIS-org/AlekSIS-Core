@@ -243,6 +243,15 @@ MENUS = {
                         )
                     ],
                 },
+                {
+                    "name": _("Sign up"),
+                    "url": "invite_person",
+                    "icon": "card_giftcard",
+                    "validators":
+                    ["menu_generator.validators.is_authenticated",
+                    ("aleksis.core.util.predicates.permission_validator", "core.can_invite"),
+                    ],
+                },
             ],
         },
     ],
