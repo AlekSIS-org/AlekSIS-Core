@@ -19,6 +19,7 @@ from django.db.models import Model, QuerySet
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.utils.functional import lazy
 
 from cache_memoize import cache_memoize
@@ -401,3 +402,9 @@ def queryset_rules_filter(
             wanted_objects.add(item.pk)
 
     return queryset.filter(pk__in=wanted_objects)
+
+
+def generate_random_code() -> str:
+    """Generate random code for e.g. invitations."""
+    length = get_site_preferences()["auth__invite_code_length"]
+    return "-".join([get_random_string(5) for _ in range(length)])

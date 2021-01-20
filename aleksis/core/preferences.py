@@ -8,6 +8,7 @@ from dynamic_preferences.types import (
     BooleanPreference,
     ChoicePreference,
     FilePreference,
+    IntegerPreference,
     ModelMultipleChoicePreference,
     MultipleChoicePreference,
     StringPreference,
@@ -216,6 +217,14 @@ class InviteEnabled(BooleanPreference):
     name = "invite_enabled"
     default = False
     verbose_name = _("Enable invitations")
+
+
+@site_preferences_registry.register
+class InviteCodeLength(IntegerPreference):
+    section = auth
+    name = "invite_code_length"
+    default = 3
+    verbose_name = _("Length of invite code. (Default 3: abcde-acbde-abcde)")
 
 
 @site_preferences_registry.register

@@ -22,6 +22,7 @@ from django.utils.translation import gettext_lazy as _
 import jsonstore
 from cache_memoize import cache_memoize
 from dynamic_preferences.models import PerInstancePreferenceModel
+from invitations.base_invitation import AbstractBaseInvitation
 from model_utils.models import TimeStampedModel
 from phonenumber_field.modelfields import PhoneNumberField
 from polymorphic.models import PolymorphicModel
@@ -36,7 +37,7 @@ from .managers import (
 )
 from .mixins import ExtensibleModel, PureDjangoModel, SchoolTermRelatedExtensibleModel
 from .tasks import send_notification
-from .util.core_helpers import get_site_preferences, now_tomorrow
+from .util.core_helpers import generate_random_code, get_site_preferences, now_tomorrow
 from .util.model_helpers import ICONS
 
 FIELD_CHOICES = (
@@ -897,3 +898,13 @@ class DataCheckResult(ExtensibleModel):
             ("run_data_checks", _("Can run data checks")),
             ("solve_data_problem", _("Can solve data check problems")),
         )
+
+
+class PersonInvitation(AbstractBaseInvitation, PureDjangoModel):
+    """Model for invitations."""
+
+    @classmethod
+    def create(cls, email, inviter=None, **kwargs):
+        key = generate_random_code()
+        instance = cls._default_manager.create(email=email, key=key, inviter=inviter, **kwargs)
+        return instance
