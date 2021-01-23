@@ -21,7 +21,7 @@ class EnsurePersonMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
-        if not has_person(request):
+        if not has_person(request) and not request.user.is_anonymous:
             prefs = get_site_preferences()
             if (
                 prefs.get("account__auto_link_person", False)
