@@ -288,6 +288,8 @@ INVITATIONS_INVITATION_ONLY = _settings.get("auth.invitation.invite_only", True)
 
 INVITATIONS_EMAIL_SUBJECT_PREFIX = ACCOUNT_EMAIL_SUBJECT_PREFIX
 
+INVITATIONS_INVITATION_MODEL = "core.PersonInvitation"
+
 # LDAP config
 
 if _settings.get("ldap.uri", None):
