@@ -903,6 +903,8 @@ class DataCheckResult(ExtensibleModel):
 class PersonInvitation(AbstractBaseInvitation, PureDjangoModel):
     """Model for invitations."""
 
+    email = models.EmailField(verbose_name=_("E-Mail"))
+
     @classmethod
     def create(cls, email, inviter=None, **kwargs):
         key = generate_random_code()

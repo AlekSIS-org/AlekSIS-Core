@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
                 ('key', models.CharField(max_length=64, unique=True, verbose_name='key')),
                 ('sent', models.DateTimeField(null=True, verbose_name='sent')),
                 ('inviter', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('email', models.EmailField(verbose_name='email')),
             ],
             options={
                 'abstract': False,

@@ -928,7 +928,7 @@ class EditDashboardView(View):
         return render(request, "core/edit_dashboard.html", context=context)
 
 
-class InvitePerson(PermissionRequiredMixin, SendInvite, SingleTableView):
+class InvitePerson(PermissionRequiredMixin, SingleTableView, SendInvite):
     """View to invite a person to register an account."""
 
     template_name = "invitations/forms/_invite.html"
@@ -936,3 +936,9 @@ class InvitePerson(PermissionRequiredMixin, SendInvite, SingleTableView):
     model = Invitation
     table_class = InvitationsTable
     context = {}
+
+    def get_context_data(self, **kwargs):
+        queryset = kwargs.pop("object_list", None)
+        if queryset is None:
+            self.object_list = self.model.objects.all()
+        return super().get_context_data(**kwargs)
