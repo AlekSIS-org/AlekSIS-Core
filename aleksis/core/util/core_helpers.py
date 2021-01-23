@@ -177,6 +177,9 @@ def has_person(obj: Union[HttpRequest, Model]) -> bool:
         else:
             return False
 
+    if obj.is_anonymous:
+        return False
+
     person = getattr(obj, "person", None)
     if person is None:
         return False

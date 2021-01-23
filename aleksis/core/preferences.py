@@ -210,18 +210,6 @@ class SchoolNameOfficial(StringPreference):
 
 
 @site_preferences_registry.register
-class AuthenticationBackends(MultipleChoicePreference):
-    section = auth
-    name = "backends"
-    default = None
-    verbose_name = _("Enabled custom authentication backends")
-    field_attribute = {"initial": []}
-
-    def get_choices(self):
-        return [(b, b) for b in settings.CUSTOM_AUTHENTICATION_BACKENDS]
-
-
-@site_preferences_registry.register
 class SignupEnabled(BooleanPreference):
     section = auth
     name = "signup_enabled"

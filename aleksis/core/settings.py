@@ -42,6 +42,7 @@ DEBUG_TOOLBAR_CONFIG = {
     "SHOW_COLLAPSED": True,
     "JQUERY_URL": "",
     "SHOW_TOOLBAR_CALLBACK": "aleksis.core.util.core_helpers.dt_show_toolbar",
+    "DISABLE_PANELS": {},
 }
 
 DEBUG_TOOLBAR_PANELS = [
@@ -797,7 +798,5 @@ HEALTH_CHECK = {
     "DISK_USAGE_MAX": _settings.get("health.disk_usage_max_percent", 90),
     "MEMORY_MIN": _settings.get("health.memory_min_mb", 500),
 }
-
-ORIGINAL_AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS[:]
 
 PROMETHEUS_EXPORT_MIGRATIONS = False
