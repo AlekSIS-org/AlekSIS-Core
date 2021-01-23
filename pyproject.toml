@@ -38,7 +38,7 @@ Django = "^3.0"
 django-any-js = "^1.0"
 django-debug-toolbar = "^2.0"
 django-middleware-global-request = "^0.1.2"
-django-menu-generator = "^1.0.4"
+django-menu-generator-ng = "^1.2.0"
 django-tables2 = "^2.1"
 Pillow = "^8.0"
 django-phonenumber-field = {version = "<5.1", extras = ["phonenumbers"]}

@@ -47,6 +47,28 @@ class _ExtensibleModelBase(models.base.ModelBase):
         return mcls
 
 
+def _generate_one_to_one_proxy_property(field, subfield):
+    def getter(self):
+        if hasattr(self, field.name):
+            related = getattr(self, field.name)
+            return getattr(related, subfield.name)
+        # Related instane does not exist
+        return None
+
+    def setter(self, val):
+        if hasattr(self, field.name):
+            related = getattr(self, field.name)
+        else:
+            # Auto-create related instance (but do not save)
+            related = field.related_model()
+            setattr(related, field.remote_field.name, self)
+            # Ensure the related model is saved later
+            self._save_reverse = getattr(self, "_save_reverse", []) + [related]
+        setattr(related, subfield.name, val)
+
+    return property(getter, setter)
+
+
 class ExtensibleModel(models.Model, metaclass=_ExtensibleModelBase):
     """Base model for all objects in AlekSIS apps.
 
@@ -248,13 +270,51 @@ class ExtensibleModel(models.Model, metaclass=_ExtensibleModelBase):
             to.property_(_virtual_related, related_name)
 
     @classmethod
-    def syncable_fields(cls) -> List[models.Field]:
-        """Collect all fields that can be synced on a model."""
-        return [
-            field
-            for field in cls._meta.fields
-            if (field.editable and not field.auto_created and not field.is_relation)
-        ]
+    def syncable_fields(
+        cls, recursive: bool = True, exclude_remotes: List = []
+    ) -> List[models.Field]:
+        """Collect all fields that can be synced on a model.
+
+        If recursive is True, it recurses into related models and generates virtual
+        proxy fields to access fields in related models."""
+        fields = []
+        for field in cls._meta.get_fields():
+            if field.is_relation and field.one_to_one and recursive:
+                if ExtensibleModel not in field.related_model.__mro__:
+                    # Related model is not extensible and thus has no syncable fields
+                    continue
+                if field.related_model in exclude_remotes:
+                    # Remote is excluded, probably to avoid recursion
+                    continue
+
+                # Recurse into related model to get its fields as well
+                for subfield in field.related_model.syncable_fields(
+                    recursive, exclude_remotes + [cls]
+                ):
+                    # generate virtual field names for proxy access
+                    name = f"_{field.name}__{subfield.name}"
+                    verbose_name = f"{field.name} ({field.related_model._meta.verbose_name}) → {subfield.verbose_name}"
+
+                    if not hasattr(cls, name):
+                        # Add proxy properties to handle access to related model
+                        setattr(cls, name, _generate_one_to_one_proxy_property(field, subfield))
+
+                    # Generate a fake field class with enough API to detect attribute names
+                    fields.append(
+                        type(
+                            "FakeRelatedProxyField",
+                            (),
+                            {
+                                "name": name,
+                                "verbose_name": verbose_name,
+                                "to_python": lambda v: subfield.to_python(v),
+                            },
+                        )
+                    )
+            elif field.editable and not field.auto_created:
+                fields.append(field)
+
+        return fields
 
     @classmethod
     def syncable_fields_choices(cls) -> Tuple[Tuple[str, str]]:
@@ -272,6 +332,16 @@ class ExtensibleModel(models.Model, metaclass=_ExtensibleModelBase):
     def add_permission(cls, name: str, verbose_name: str):
         """Dynamically add a new permission to a model."""
         cls.extra_permissions.append((name, verbose_name))
+
+    def save(self, *args, **kwargs):
+        """Ensure all functionality of our extensions that needs saving gets it."""
+        # For auto-created remote syncable fields
+        if hasattr(self, "_save_reverse"):
+            for related in self._save_reverse:
+                related.save()
+            del self._save_reverse
+
+        super().save(*args, **kwargs)
 
     class Meta:
         abstract = True
