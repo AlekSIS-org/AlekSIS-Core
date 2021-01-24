@@ -77,7 +77,7 @@ from .tables import (
 )
 from .util import messages
 from .util.apps import AppConfig
-from .util.core_helpers import objectgetter_optional
+from .util.core_helpers import generate_random_code, objectgetter_optional
 from .util.forms import PreferenceLayout
 
 
@@ -972,3 +972,20 @@ def enter_invitation_code(request: HttpRequest) -> HttpResponse:
                 )
 
     return render(request, "invitations/enter.html", context)
+
+
+def generate_invitation_code(request: HttpRequest) -> HttpResponse:
+    """View to generate an invitation code."""
+    context = {}
+
+    code = generate_random_code()
+
+    Invitation.objects.create(
+        email=None, inviter=request.user, key=code,
+    )
+
+    messages.success(
+        request,
+        _(f"The invitation was successfully created." " The invitation code is {code}"),
+        context,
+    )

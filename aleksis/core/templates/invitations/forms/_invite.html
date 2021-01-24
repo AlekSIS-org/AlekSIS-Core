@@ -12,12 +12,22 @@
 
 {% block content %}
 
+  <h4>{% trans "Invite by email address" %}</h4>
+
   <form method="post">
     {% csrf_token %}
     {% form form=form %}{% endform %}
     {% trans "Invite" as caption %}
     {% include "core/partials/save_button.html" with caption=caption icon="card_giftcard" %}
   </form>
+
+  <h4>{% trans "Generate invitation code" %}</h4>
+
+  <button class="btn waves-effect waves-light">
+    <a href="{% url 'generate_code' %}">{% trans "Generate code" %}</a>
+  </button>
+
+  <h4>{% trans "Invitations" %}
 
   {% render_table table %}
 

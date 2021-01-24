@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='personinvitation',
             name='email',
-            field=models.EmailField(max_length=254, verbose_name='E-Mail'),
+            field=models.EmailField(max_length=254, verbose_name='E-Mail', blank=True, null=True),
         ),
     ]

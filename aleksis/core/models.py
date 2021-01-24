@@ -903,7 +903,7 @@ class DataCheckResult(ExtensibleModel):
 class PersonInvitation(AbstractBaseInvitation, PureDjangoModel):
     """Model for invitations."""
 
-    email = models.EmailField(verbose_name=_("E-Mail"))
+    email = models.EmailField(verbose_name=_("E-Mail"), blank=True, null=True)
 
     @classmethod
     def create(cls, email, inviter=None, **kwargs):
