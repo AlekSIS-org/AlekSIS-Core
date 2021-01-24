@@ -1,0 +1,20 @@
+{# -*- engine:django -*- #}
+
+{% extends "core/base.html" %}
+
+{% load material_form i18n %}
+
+{% block browser_title %}{% blocktrans %}Enter code{% endblocktrans %}{% endblock %}
+{% block page_title %}{% blocktrans %}Enter code{% endblocktrans %}{% endblock %}
+
+
+{% block content %}
+
+  <form method="post">
+    {% csrf_token %}
+    {% form form=invitation_code_form %}{% endform %}
+    {% trans "Accept invite" as caption %}
+    {% include "core/partials/save_button.html" with caption=caption icon="card_giftcard" %}
+  </form>
+
+{% endblock %}

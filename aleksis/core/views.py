@@ -942,3 +942,33 @@ class InvitePerson(PermissionRequiredMixin, SingleTableView, SendInvite):
         if queryset is None:
             self.object_list = self.model.objects.all()
         return super().get_context_data(**kwargs)
+
+
+def enter_invitation_code(request: HttpRequest) -> HttpResponse:
+    """View to enter an invite code."""
+    context = {}
+
+    invitation_code_form = InvitationCodeForm(request.POST or None)
+    context["invitation_code_form"] = invitation_code_form
+
+    if request.method == "POST":
+        if invitation_code_form.is_valid():
+            code = invitation_code_form.cleaned_data["code"]
+            if (
+                Invitation.objects.get(key=code)
+                and not Invitation.objects.get(key=code).accepted
+                and not Invitation.objects.get(key=code).expired()
+            ):
+                invitation = Invitation.objects.get(key=code)
+                invitation.accepted = True
+                invitation.save()
+            else:
+                messages.error(
+                    request,
+                    _(
+                        "The entered code is invalid. The invitation"
+                        " is either expired or does not exist."
+                    ),
+                )
+
+    return render(request, "invitations/enter.html", context)

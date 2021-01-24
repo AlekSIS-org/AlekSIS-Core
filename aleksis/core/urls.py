@@ -22,6 +22,7 @@ urlpatterns = [
     path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("accounts/", include("allauth.urls")),
     path("invitations/send-invite", views.InvitePerson.as_view(), name="invite_person"),
+    path("invitations/enter-code", views.enter_invitation_code, name="enter_invitation_cide"),
     path("invitations/", include("invitations.urls")),
     path("admin/", admin.site.urls),
     path("data_management/", views.data_management, name="data_management"),

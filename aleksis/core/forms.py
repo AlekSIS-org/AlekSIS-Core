@@ -370,3 +370,11 @@ class DashboardWidgetOrderForm(ExtensibleForm):
 DashboardWidgetOrderFormSet = forms.formset_factory(
     form=DashboardWidgetOrderForm, max_num=0, extra=0
 )
+
+
+class InvitationCodeForm(forms.Form):
+    """Form to enter an invitation code."""
+
+    code = forms.CharField(
+        label=_("Invitation code"), description=_("Please enter your invitation code.")
+    )
