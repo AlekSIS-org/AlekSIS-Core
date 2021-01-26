@@ -29,7 +29,6 @@ MENUS = {
                 ("aleksis.core.util.predicates.permission_validator", "core.can_invite"),
             ],
         },
-
         {
             "name": _("Dashboard"),
             "url": "index",

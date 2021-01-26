@@ -26,8 +26,7 @@ from haystack.inputs import AutoQuery
 from haystack.query import SearchQuerySet
 from haystack.views import SearchView
 from health_check.views import MainView
-from invitations.models import Invitation
-from invitations.views import accept_invitation, SendInvite
+from invitations.views import SendInvite, accept_invitation
 from reversion import set_user
 from reversion.views import RevisionMixin
 from rules.contrib.views import PermissionRequiredMixin, permission_required
@@ -83,7 +82,6 @@ from .util.apps import AppConfig
 from .util.core_helpers import generate_random_code, objectgetter_optional
 from .util.forms import PreferenceLayout
 
-from aleksis.apps.ldap.util.ldap_sync import ldap_sync_user_on_login
 
 @permission_required("core.view_dashboard")
 def index(request: HttpRequest) -> HttpResponse:
@@ -976,9 +974,9 @@ def enter_invitation_code(request: HttpRequest) -> HttpResponse:
                 and not PersonInvitation.objects.get(key=code).key_expired()
             ):
                 invitation = PersonInvitation.objects.get(key=code)
-                accept_invitation(invitation=invitation,
-                              request=request,
-                              signal_sender=request.user)
+                accept_invitation(
+                    invitation=invitation, request=request, signal_sender=request.user
+                )
                 return redirect("account_signup")
             else:
                 messages.error(
@@ -1005,8 +1003,7 @@ def generate_invitation_code(request: HttpRequest) -> HttpResponse:
     code = "-".join(wrap(code, 5))
 
     messages.success(
-        request,
-        _(f"The invitation was successfully created. The invitation code is {code}"),
+        request, _(f"The invitation was successfully created. The invitation code is {code}"),
     )
 
     return redirect("invite_person")

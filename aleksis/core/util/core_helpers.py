@@ -410,7 +410,7 @@ def queryset_rules_filter(
 def generate_random_code() -> str:
     """Generate random code for e.g. invitations."""
     length = get_site_preferences()["auth__invite_code_length"]
-    return get_random_string(5*length).lower()
+    return get_random_string(5 * length).lower()
 
 
 def unread_notifications_badge(request: HttpRequest) -> int:

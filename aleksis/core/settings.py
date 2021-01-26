@@ -42,7 +42,7 @@ DEBUG_TOOLBAR_CONFIG = {
     "SHOW_COLLAPSED": True,
     "JQUERY_URL": "",
     "SHOW_TOOLBAR_CALLBACK": "aleksis.core.util.core_helpers.dt_show_toolbar",
-    "DISABLE_PANELS": {"debug_toolbar.panels.redirects.RedirectsPanel"},
+    "DISABLE_PANELS": {},
 }
 
 DEBUG_TOOLBAR_PANELS = [
@@ -57,6 +57,7 @@ DEBUG_TOOLBAR_PANELS = [
     "debug_toolbar.panels.templates.TemplatesPanel",
     "debug_toolbar.panels.signals.SignalsPanel",
     "debug_toolbar.panels.logging.LoggingPanel",
+    "debug_toolbar.panels.redirects.RedirectsPanel",
     "debug_toolbar.panels.profiling.ProfilingPanel",
 ]
 
@@ -88,6 +89,7 @@ INSTALLED_APPS = [
     "menu_generator",
     "reversion",
     "phonenumber_field",
+    "debug_toolbar",
     "django_prometheus",
     "django_select2",
     "hattori",
@@ -98,7 +100,6 @@ INSTALLED_APPS = [
     "django_otp",
     "otp_yubikey",
     "aleksis.core",
-    "debug_toolbar",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",

@@ -3,8 +3,6 @@ from django.utils.translation import gettext_lazy as _
 import django_tables2 as tables
 from django_tables2.utils import A
 
-from aleksis.core.models import Person
-
 
 class SchoolTermTable(tables.Table):
     """Table to list persons."""
@@ -93,13 +91,6 @@ class DashboardWidgetTable(tables.Table):
 
     def render_widget_name(self, value, record):
         return record._meta.verbose_name
-
-
-class PersonColumn(tables.Column):
-    """Returns person object from given id."""
-
-    def render(self, value):
-        return Person.objects.get(id=value)
 
 
 class InvitationsTable(tables.Table):
