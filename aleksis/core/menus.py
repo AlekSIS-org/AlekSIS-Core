@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
+from .util.core_helpers import unread_notifications_badge
+
 MENUS = {
     "NAV_MENU_CORE": [
         {
@@ -33,6 +35,15 @@ MENUS = {
             "url": "index",
             "icon": "home",
             "validators": ["menu_generator.validators.is_authenticated"],
+        },
+        {
+            "name": _("Notifications"),
+            "url": "notifications",
+            "icon": "notifications",
+            "badge": unread_notifications_badge,
+            "validators": [
+                ("aleksis.core.util.predicates.permission_validator", "core.view_notifications",),
+            ],
         },
         {
             "name": _("Account"),

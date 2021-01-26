@@ -249,6 +249,16 @@ class Person(ExtensibleModel):
             )
         ]
 
+    @property
+    def unread_notifications(self) -> QuerySet:
+        """Get all unread notifications for this person."""
+        return self.notifications.filter(read=False)
+
+    @property
+    def unread_notifications_count(self) -> int:
+        """Return the count of unread notifications for this person."""
+        return self.unread_notifications.count()
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 

@@ -51,3 +51,14 @@ def parse_json(value: Optional[str] = None) -> Union[dict, None]:
     if not value:
         return None
     return json.loads(value)
+
+
+@register.simple_tag(takes_context=True)
+def build_badge(context: dict, item: dict) -> Any:
+    """Get menu badge content from django-menu-generator dict."""
+    request = context["request"]
+    badge = item.get("badge")
+    if callable(badge):
+        return badge(request)
+    else:
+        return badge

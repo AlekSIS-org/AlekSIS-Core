@@ -2,6 +2,9 @@
   {% if img %}
     <img class="{{ img_classes }}" src="{{ img }}" alt="{{ alt }}">
   {% endif %}
+  {% if icon %}
+    <i class="material-icons left">{{ icon }}</i>
+  {% endif %}
   {{ content }}
   {% if close %}
     <i class="close material-icons"></i>

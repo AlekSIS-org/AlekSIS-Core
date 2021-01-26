@@ -411,3 +411,8 @@ def generate_random_code() -> str:
     """Generate random code for e.g. invitations."""
     length = get_site_preferences()["auth__invite_code_length"]
     return get_random_string(5*length).lower()
+
+
+def unread_notifications_badge(request: HttpRequest) -> int:
+    """Generate badge content with the number of unread notifications."""
+    return request.user.person.unread_notifications_count

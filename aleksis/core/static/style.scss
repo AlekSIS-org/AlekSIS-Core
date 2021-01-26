@@ -136,9 +136,8 @@ ul.sidenav li.logo > a:hover {
   background-color: lighten($primary-color, 5%);
 }
 
-li.active > a > .sidenav-badge {
-  background-color: whitesmoke !important;
-  color: $primary-color !important;
+.sidenav-badge {
+  min-width: 2rem!important;
 }
 
 .sidenav li.search {
@@ -286,6 +285,10 @@ form .row {
   margin-bottom: 0;
 }
 
+.help-block {
+  font-size: 75%;
+}
+
 label.chips-checkbox {
   &.active {
     outline: none;
@@ -344,6 +347,11 @@ span.badge .material-icons {
   font-size: 0.9rem;
 }
 
+.chip .material-icons {
+  line-height: 30px;
+  margin-right: 10px;
+  margin-left: -2px;
+}
 
 /*+++++++++*/
 /* Buttons */
@@ -382,6 +390,50 @@ span.badge .material-icons {
 
 table.striped > tbody > tr:nth-child(odd), table tr.striped, table tbody.striped tr {
   background-color: rgba(208, 208, 208, 0.5);
+}
+
+th.orderable > a {
+  color: rgba(0, 0, 0, 0.6);
+  display: block;
+  width: inherit;
+  height: inherit;
+}
+
+th.orderable > a::after {
+  @extend i.material-icons;
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+  float: right;
+  content: "unfold_more";
+}
+
+th.orderable.asc > a {
+  color: inherit;
+
+  &::after {
+    content: "expand_less";
+  }
+}
+
+th.orderable.desc > a {
+  color: inherit;
+
+  &::after {
+    content: "expand_more";
+  }
 }
 
 /*+++++++*/

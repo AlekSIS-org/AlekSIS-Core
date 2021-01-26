@@ -1,6 +1,6 @@
 {# -*- engine:django -*- #}
 
-{% load menu_generator %}
+{% load menu_generator data_helpers %}
 
 {% get_menu "NAV_MENU_CORE" as core_menu %}
 
@@ -16,6 +16,10 @@
             <i class="material-icons">{{ item.icon }}</i>
           {% endif %}
           {{ item.name }}
+          {% build_badge item as badge %}
+          {% if badge %}
+            <span class="new badge sidenav-badge"> {{ badge }}</span>
+          {% endif %}
         </a>
       </li>
     {% endif %}
@@ -28,6 +32,10 @@
             <i class="material-icons">{{ item.icon }}</i>
           {% endif %}
           {{ item.name }}
+          {% build_badge item as badge %}
+          {% if badge %}
+            <span class="new badge sidenav-badge"> {{ badge }}</span>
+          {% endif %}
         </a>
         <div class="collapsible-body">
           <ul>
@@ -40,6 +48,10 @@
                     <i class="material-icons">{{ menu.icon }}</i>
                   {% endif %}
                   {{ menu.name }}
+                  {% build_badge item as badge %}
+                  {% if badge %}
+                    <span class="new badge sidenav-badge"> {{ badge }}</span>
+                  {% endif %}
                 </a>
               </li>
             {% endfor %}

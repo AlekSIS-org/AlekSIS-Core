@@ -116,6 +116,18 @@ def index(request: HttpRequest) -> HttpResponse:
     return render(request, "core/index.html", context)
 
 
+class NotificationsListView(PermissionRequiredMixin, ListView):
+    permission_required = "core.view_notifications"
+    template_name = "core/notifications.html"
+
+    def get_queryset(self) -> QuerySet:
+        return self.request.user.person.notifications.order_by("-created")
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        self.get_queryset().filter(read=False).update(read=True)
+        return super().get_context_data(**kwargs)
+
+
 def about(request: HttpRequest) -> HttpResponse:
     """About page listing all apps."""
     context = {}

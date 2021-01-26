@@ -17,6 +17,9 @@ rules.add_perm("core", rules.always_allow)
 # View dashboard
 rules.add_perm("core.view_dashboard", has_person)
 
+# View notifications
+rules.add_perm("core.view_notifications", has_person)
+
 # Use search
 search_predicate = has_person & has_global_perm("core.search")
 rules.add_perm("core.search", search_predicate)

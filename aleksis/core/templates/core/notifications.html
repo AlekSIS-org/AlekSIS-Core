@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+{% load i18n static dashboard %}
+
+{% block browser_title %}{% blocktrans %}Notifications{% endblocktrans %}{% endblock %}
+{% block page_title %}{% blocktrans %}Notifications{% endblocktrans %}{% endblock %}
+
+
+{% block content %}
+  {% if object_list %}
+    <ul class="collection">
+      {% for notification in object_list %}
+        <li class="collection-item">
+          <span class="badge new primary-color">{{ notification.sender }}</span>
+          <span class="title">{{ notification.title }}</span>
+          <p>
+            <i class="material-icons left">access_time</i> {{ notification.created }}
+          </p>
+          <p>
+            {{ notification.description }}
+          </p>
+          {% if notification.link %}
+            <p>
+              <a href="{{ notification.link }}">{% blocktrans %}More information →{% endblocktrans %}</a>
+            </p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>{% blocktrans %}No notifications available yet.{% endblocktrans %}</p>
+  {% endif %}
+{% endblock %}
