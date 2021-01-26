@@ -407,9 +407,8 @@ def queryset_rules_filter(
     return queryset.filter(pk__in=wanted_objects)
 
 
-def generate_random_code() -> str:
+def generate_random_code(length) -> str:
     """Generate random code for e.g. invitations."""
-    length = get_site_preferences()["auth__invite_code_length"]
     return get_random_string(5 * length).lower()
 
 

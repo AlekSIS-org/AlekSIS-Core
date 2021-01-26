@@ -11,11 +11,13 @@ from django.forms.models import BaseModelForm, modelform_factory
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.generic.base import View
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 
 import reversion
@@ -79,7 +81,7 @@ from .tables import (
 )
 from .util import messages
 from .util.apps import AppConfig
-from .util.core_helpers import generate_random_code, objectgetter_optional
+from .util.core_helpers import generate_random_code, get_site_preferences, objectgetter_optional
 from .util.forms import PreferenceLayout
 
 
@@ -958,52 +960,47 @@ class InvitePerson(PermissionRequiredMixin, SingleTableView, SendInvite):
         return super().get_context_data(**kwargs)
 
 
-def enter_invitation_code(request: HttpRequest) -> HttpResponse:
-    """View to enter an invite code."""
-    context = {}
+class EnterInvitationCode(FormView):
+    """View to enter an invitation code."""
 
-    invitation_code_form = InvitationCodeForm(request.POST or None)
-    context["invitation_code_form"] = invitation_code_form
+    template_name = "invitations/enter.html"
+    form_class = InvitationCodeForm
 
-    if request.method == "POST":
-        if invitation_code_form.is_valid():
-            code = "".join(invitation_code_form.cleaned_data["code"].split("-"))
-            if (
-                PersonInvitation.objects.filter(key=code).exists()
-                and not PersonInvitation.objects.get(key=code).accepted
-                and not PersonInvitation.objects.get(key=code).key_expired()
-            ):
-                invitation = PersonInvitation.objects.get(key=code)
-                accept_invitation(
-                    invitation=invitation, request=request, signal_sender=request.user
-                )
-                return redirect("account_signup")
-            else:
-                messages.error(
-                    request,
-                    _(
-                        "The entered code is invalid. The invitation"
-                        " is either expired or does not exist."
-                    ),
-                )
-
-    return render(request, "invitations/enter.html", context)
+    def form_valid(self, form):
+        code = "".join(form.cleaned_data["code"].split("-"))
+        if (
+            PersonInvitation.objects.filter(key=code).exists()
+            and not PersonInvitation.objects.get(key=code).accepted
+            and not PersonInvitation.objects.get(key=code).key_expired()
+        ):
+            invitation = PersonInvitation.objects.get(key=code)
+            accept_invitation(invitation=invitation, request=request, signal_sender=request.user)
+            return redirect("account_signup")
+        else:
+            messages.error(
+                request,
+                _(
+                    "The entered code is invalid. The invitation"
+                    " is either expired or does not exist."
+                ),
+            )
 
 
-def generate_invitation_code(request: HttpRequest) -> HttpResponse:
+class GenerateInvitationCode(View):
     """View to generate an invitation code."""
-    context = {}
 
-    code = generate_random_code()
+    def get(self, request):
+        length = get_site_preferences()["auth__invite_code_length"]
+        code = generate_random_code(length)
 
-    PersonInvitation.objects.create(
-        email="", inviter=request.user, key=code,
-    )
+        PersonInvitation.objects.create(
+            email="", inviter=request.user, key=code, sent=timezone.now()
+        )
 
-    code = "-".join(wrap(code, 5))
+        code = "-".join(wrap(code, 5))
 
-    messages.success(
-        request, _(f"The invitation was successfully created. The invitation code is {code}"),
-    )
+        messages.success(
+            request, _(f"The invitation was successfully created. The invitation code is {code}"),
+        )
 
-    return redirect("invite_person")
+        return redirect("invite_person")

@@ -218,11 +218,11 @@ class SignupEnabled(BooleanPreference):
 
 
 @site_preferences_registry.register
-class SignupInviteOnly(BooleanPreference):
+class SignupOpen(BooleanPreference):
     section = auth
     name = "signup_open"
     default = False
-    verbose_name = _("Signup open for everyone.")
+    verbose_name = _("Signup open for everyone or invite only.")
 
 
 @site_preferences_registry.register
@@ -239,6 +239,14 @@ class InviteCodeLength(IntegerPreference):
     name = "invite_code_length"
     default = 3
     verbose_name = _("Length of invite code. (Default 3: abcde-acbde-abcde)")
+
+
+@site_preferences_registry.register
+class InviteDayExpiry(IntegerPreference):
+    section = auth
+    name = "invite_day_expiry"
+    default = 3
+    verbose_name = _("Expiration time of invitations in days.")
 
 
 @site_preferences_registry.register
