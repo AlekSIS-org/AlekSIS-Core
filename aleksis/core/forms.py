@@ -1,10 +1,13 @@
 from datetime import datetime, time
 
 from django import forms
-from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from allauth.account.adapter import get_adapter
+from allauth.account.forms import SignupForm
+from allauth.account.utils import get_user_model, setup_user_email
 from django_select2.forms import ModelSelect2MultipleWidget, ModelSelect2Widget, Select2Widget
 from dynamic_preferences.forms import PreferenceForm
 from material import Fieldset, Layout, Row
@@ -24,6 +27,7 @@ from .registries import (
     person_preferences_registry,
     site_preferences_registry,
 )
+from .util.core_helpers import get_site_preferences
 
 
 class PersonAccountForm(forms.ModelForm):
@@ -378,3 +382,77 @@ class InvitationCodeForm(forms.Form):
     code = forms.CharField(
         label=_("Invitation code"), help_text=_("Please enter your invitation code.")
     )
+
+
+class AccountRegisterForm(SignupForm, ExtensibleForm):
+    """Form to register new user accounts."""
+
+    class Meta:
+        model = Person
+        fields = []
+
+    layout = Layout(
+        Fieldset(_("Base data"), Row("first_name", "last_name"),),
+        Fieldset(
+            _("Account data"), "username", Row("email", "email2"), Row("password1", "password2"),
+        ),
+        Fieldset(_("Consents"), Row("privacy_policy"),),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(AccountRegisterForm, self).__init__(*args, **kwargs)
+        self.fields["password1"] = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
+
+        privacy_policy = get_site_preferences()["footer__privacy_url"]
+
+        if settings.SIGNUP_PASSWORD_ENTER_TWICE:
+            self.fields["password2"] = forms.CharField(
+                label=_("Password (again)"), widget=forms.PasswordInput
+            )
+
+        self.fields["first_name"] = forms.CharField(
+            required=True, widget=forms.TextInput(attrs={"placeholder": _("First name"),})
+        )
+
+        self.fields["last_name"] = forms.CharField(
+            required=True, widget=forms.TextInput(attrs={"placeholder": _("Last name"),})
+        )
+
+        self.fields["privacy_policy"] = forms.BooleanField(
+            label=_("Privacy policy"),
+            help_text=_(
+                f"I have read the <a href='{privacy_policy}'>Privacy policy</a>"
+                " and agree with them."
+            ),
+            required=True,
+        )
+
+    def clean(self):
+        super(AccountRegisterForm, self).clean()
+
+        dummy_user = get_user_model()
+        password = self.cleaned_data.get("password1")
+        if password:
+            try:
+                get_adapter().clean_password(password, user=dummy_user)
+            except forms.ValidationError as e:
+                self.add_error("password1", e)
+
+        if (
+            settings.SIGNUP_PASSWORD_ENTER_TWICE
+            and "password1" in self.cleaned_data
+            and "password2" in self.cleaned_data
+        ):
+            if self.cleaned_data["password1"] != self.cleaned_data["password2"]:
+                self.add_error(
+                    "password2", _("You must type the same password each time."),
+                )
+        return self.cleaned_data
+
+    def save(self, request):
+        adapter = get_adapter(request)
+        user = adapter.new_user(request)
+        adapter.save_user(request, user, self)
+        self.custom_signup(request, user)
+        setup_user_email(request, user, [])
+        return user
