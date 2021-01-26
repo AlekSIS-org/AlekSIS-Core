@@ -23,11 +23,11 @@
 
   <h4>{% trans "Generate invitation code" %}</h4>
 
-  <button class="btn waves-effect waves-light">
-    <a href="{% url 'generate_code' %}">{% trans "Generate code" %}</a>
-  </button>
+  <a class="btn waves-effect waves-light" href="{% url 'generate_invitation_code' %}">
+    {% trans "Generate code" %}
+  </a>
 
-  <h4>{% trans "Invitations" %}
+  <h4>{% trans "Invitations" %}</h4>
 
   {% render_table table %}
 

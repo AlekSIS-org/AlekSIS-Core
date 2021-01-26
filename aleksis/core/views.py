@@ -1,3 +1,4 @@
+from textwrap import wrap
 from typing import Any, Dict, Optional, Type
 
 from django.apps import apps
@@ -26,7 +27,7 @@ from haystack.query import SearchQuerySet
 from haystack.views import SearchView
 from health_check.views import MainView
 from invitations.models import Invitation
-from invitations.views import SendInvite
+from invitations.views import accept_invitation, SendInvite
 from reversion import set_user
 from reversion.views import RevisionMixin
 from rules.contrib.views import PermissionRequiredMixin, permission_required
@@ -43,6 +44,7 @@ from .forms import (
     EditGroupTypeForm,
     EditPersonForm,
     GroupPreferenceForm,
+    InvitationCodeForm,
     PersonPreferenceForm,
     PersonsAccountsFormSet,
     SchoolTermForm,
@@ -59,6 +61,7 @@ from .models import (
     GroupType,
     Notification,
     Person,
+    PersonInvitation,
     SchoolTerm,
 )
 from .registries import (
@@ -80,6 +83,7 @@ from .util.apps import AppConfig
 from .util.core_helpers import generate_random_code, objectgetter_optional
 from .util.forms import PreferenceLayout
 
+from aleksis.apps.ldap.util.ldap_sync import ldap_sync_user_on_login
 
 @permission_required("core.view_dashboard")
 def index(request: HttpRequest) -> HttpResponse:
@@ -933,14 +937,14 @@ class InvitePerson(PermissionRequiredMixin, SingleTableView, SendInvite):
 
     template_name = "invitations/forms/_invite.html"
     permission_required = "core.can_invite"
-    model = Invitation
+    model = PersonInvitation
     table_class = InvitationsTable
     context = {}
 
     def get_context_data(self, **kwargs):
         queryset = kwargs.pop("object_list", None)
         if queryset is None:
-            self.object_list = self.model.objects.all()
+            self.object_list = self.model.objects.all()[:5]
         return super().get_context_data(**kwargs)
 
 
@@ -953,15 +957,17 @@ def enter_invitation_code(request: HttpRequest) -> HttpResponse:
 
     if request.method == "POST":
         if invitation_code_form.is_valid():
-            code = invitation_code_form.cleaned_data["code"]
+            code = "".join(invitation_code_form.cleaned_data["code"].split("-"))
             if (
-                Invitation.objects.get(key=code)
-                and not Invitation.objects.get(key=code).accepted
-                and not Invitation.objects.get(key=code).expired()
+                PersonInvitation.objects.filter(key=code).exists()
+                and not PersonInvitation.objects.get(key=code).accepted
+                and not PersonInvitation.objects.get(key=code).key_expired()
             ):
-                invitation = Invitation.objects.get(key=code)
-                invitation.accepted = True
-                invitation.save()
+                invitation = PersonInvitation.objects.get(key=code)
+                accept_invitation(invitation=invitation,
+                              request=request,
+                              signal_sender=request.user)
+                return redirect("account_signup")
             else:
                 messages.error(
                     request,
@@ -980,12 +986,15 @@ def generate_invitation_code(request: HttpRequest) -> HttpResponse:
 
     code = generate_random_code()
 
-    Invitation.objects.create(
-        email=None, inviter=request.user, key=code,
+    PersonInvitation.objects.create(
+        email="", inviter=request.user, key=code,
     )
+
+    code = "-".join(wrap(code, 5))
 
     messages.success(
         request,
-        _(f"The invitation was successfully created." " The invitation code is {code}"),
-        context,
+        _(f"The invitation was successfully created. The invitation code is {code}"),
     )
+
+    return redirect("invite_person")

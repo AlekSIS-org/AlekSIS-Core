@@ -410,4 +410,4 @@ def queryset_rules_filter(
 def generate_random_code() -> str:
     """Generate random code for e.g. invitations."""
     length = get_site_preferences()["auth__invite_code_length"]
-    return "-".join([get_random_string(5) for _ in range(length)])
+    return get_random_string(5*length).lower()

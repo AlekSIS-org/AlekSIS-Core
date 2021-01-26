@@ -24,7 +24,7 @@ MENUS = {
             "icon": "card_giftcard",
             "validators": [
                 "menu_generator.validators.is_anonymous",
-                ("aleksis.core.util.predicates.permission_validator", "core.can_register"),
+                ("aleksis.core.util.predicates.permission_validator", "core.can_invite"),
             ],
         },
 

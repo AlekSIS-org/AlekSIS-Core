@@ -42,7 +42,7 @@ DEBUG_TOOLBAR_CONFIG = {
     "SHOW_COLLAPSED": True,
     "JQUERY_URL": "",
     "SHOW_TOOLBAR_CALLBACK": "aleksis.core.util.core_helpers.dt_show_toolbar",
-    "DISABLE_PANELS": {},
+    "DISABLE_PANELS": {"debug_toolbar.panels.redirects.RedirectsPanel"},
 }
 
 DEBUG_TOOLBAR_PANELS = [
@@ -57,7 +57,6 @@ DEBUG_TOOLBAR_PANELS = [
     "debug_toolbar.panels.templates.TemplatesPanel",
     "debug_toolbar.panels.signals.SignalsPanel",
     "debug_toolbar.panels.logging.LoggingPanel",
-    "debug_toolbar.panels.redirects.RedirectsPanel",
     "debug_toolbar.panels.profiling.ProfilingPanel",
 ]
 
@@ -89,7 +88,6 @@ INSTALLED_APPS = [
     "menu_generator",
     "reversion",
     "phonenumber_field",
-    "debug_toolbar",
     "django_prometheus",
     "django_select2",
     "hattori",
@@ -100,6 +98,7 @@ INSTALLED_APPS = [
     "django_otp",
     "otp_yubikey",
     "aleksis.core",
+    "debug_toolbar",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -253,6 +252,8 @@ ACCOUNT_FORMS = {
 # Require password confirmation
 SIGNUP_PASSWORD_ENTER_TWICE = True
 
+INVITATIONS_GONE_ON_ACCEPT_ERROR = False
+
 # Allow login by either username or email
 ACCOUNT_AUTHENTICATION_METHOD = _settings.get("auth.registration.method", "username_email")
 
@@ -285,7 +286,7 @@ ACCOUNT_ADAPTER = "invitations.models.InvitationsAdapter"
 
 INVITATIONS_INVITATION_EXPIRY = _settings.get("auth.invitation.expiry", 3)
 
-INVITATIONS_INVITATION_ONLY = _settings.get("auth.invitation.invite_only", True)
+INVITATIONS_INVITATION_ONLY = lazy_preference("auth", "invite_only")
 
 INVITATIONS_EMAIL_SUBJECT_PREFIX = ACCOUNT_EMAIL_SUBJECT_PREFIX
 
