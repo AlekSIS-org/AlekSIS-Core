@@ -26,6 +26,7 @@ from dynamic_preferences.models import PerInstancePreferenceModel
 from invitations import signals
 from invitations.adapters import get_invitations_adapter
 from invitations.base_invitation import AbstractBaseInvitation
+from invitations.models import Invitation
 from model_utils.models import TimeStampedModel
 from phonenumber_field.modelfields import PhoneNumberField
 from polymorphic.models import PolymorphicModel
@@ -914,45 +915,20 @@ class DataCheckResult(ExtensibleModel):
 
 
 class PersonInvitation(AbstractBaseInvitation, PureDjangoModel):
-    """Model for invitations."""
+    """Custom model for invitations to allow to generate invitations codes without email address."""
 
     email = models.EmailField(verbose_name=_("E-Mail address"), blank=True)
-    created = models.DateTimeField(auto_now_add=True)
 
     @classmethod
     def create(cls, email, inviter=None, **kwargs):
-        key = generate_random_code()
+        length = get_site_preferences()["auth__invite_code_length"]
+        key = generate_random_code(length)
         instance = cls._default_manager.create(email=email, key=key, inviter=inviter, **kwargs)
         return instance
 
     def __str__(self) -> str:
         return _(f"Invitation: {self.email}")
 
-    def key_expired(self):
-        expiration_date = self.created + timedelta(days=settings.INVITATIONS_INVITATION_EXPIRY)
-        return expiration_date <= timezone.now()
+    key_expired = Invitation.key_expired
 
-    def send_invitation(self, request, **kwargs):
-        current_site = kwargs.pop("site", Site.objects.get_current())
-        invite_url = reverse("invitations:accept-invite", args=[self.key])
-        invite_url = request.build_absolute_uri(invite_url)
-        ctx = kwargs
-        ctx.update(
-            {
-                "invite_url": invite_url,
-                "site_name": current_site.name,
-                "email": self.email,
-                "key": self.key,
-                "inviter": self.inviter,
-            }
-        )
-
-        email_template = "invitations/email/email_invite"
-
-        get_invitations_adapter().send_mail(email_template, self.email, ctx)
-        self.sent = timezone.now()
-        self.save()
-
-        signals.invite_url_sent.send(
-            sender=self.__class__, instance=self, invite_url_sent=invite_url, inviter=self.inviter
-        )
+    send_invitation = Invitation.send_invitation
