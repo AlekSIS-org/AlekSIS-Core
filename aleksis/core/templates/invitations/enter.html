@@ -7,14 +7,18 @@
 {% block browser_title %}{% blocktrans %}Enter code{% endblocktrans %}{% endblock %}
 {% block page_title %}{% blocktrans %}Enter code{% endblocktrans %}{% endblock %}
 
+{% block extra_head %}
+  {{ form.media }}
+{% endblock %}
 
 {% block content %}
 
   <form method="post">
     {% csrf_token %}
-    {% form form=invitation_code_form %}{% endform %}
+    {% form form=form %}{% endform %}
     {% trans "Accept invite" as caption %}
     {% include "core/partials/save_button.html" with caption=caption icon="card_giftcard" %}
   </form>
+  {{ form.media.js }}
 
 {% endblock %}

@@ -9,6 +9,7 @@ from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm
 from allauth.account.utils import get_user_model, setup_user_email
 from django_select2.forms import ModelSelect2MultipleWidget, ModelSelect2Widget, Select2Widget
+from django_split_input import SplitInput
 from dynamic_preferences.forms import PreferenceForm
 from material import Fieldset, Layout, Row
 
@@ -380,7 +381,7 @@ class InvitationCodeForm(forms.Form):
     """Form to enter an invitation code."""
 
     code = forms.CharField(
-        label=_("Invitation code"), help_text=_("Please enter your invitation code.")
+        label=_("Invitation code"), help_text=_("Please enter your invitation code."), widget=SplitInput(sizes=(5, 5, 5))
     )
 
 

@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     "django_otp",
     "otp_yubikey",
     "aleksis.core",
+    "django_split_input",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
