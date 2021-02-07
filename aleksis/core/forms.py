@@ -380,10 +380,15 @@ DashboardWidgetOrderFormSet = forms.formset_factory(
 class InvitationCodeForm(forms.Form):
     """Form to enter an invitation code."""
 
+    # Calculate number of fields
+    length = get_site_preferences()["auth__invite_code_length"]
+    sizes = (5, )
+    sizes = sizes * length
+
     code = forms.CharField(
         label=_("Invitation code"),
         help_text=_("Please enter your invitation code."),
-        widget=SplitInput(sizes=(5, 5, 5)),
+        widget=SplitInput(sizes=sizes),
     )
 
 
