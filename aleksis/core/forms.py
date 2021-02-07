@@ -382,8 +382,7 @@ class InvitationCodeForm(forms.Form):
 
     # Calculate number of fields
     length = get_site_preferences()["auth__invite_code_length"]
-    sizes = (5, )
-    sizes = sizes * length
+    sizes = (5,) * length
 
     code = forms.CharField(
         label=_("Invitation code"),

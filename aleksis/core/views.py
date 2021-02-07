@@ -28,7 +28,7 @@ from haystack.inputs import AutoQuery
 from haystack.query import SearchQuerySet
 from haystack.views import SearchView
 from health_check.views import MainView
-from invitations.views import SendInvite, accept_invitation
+from invitations.views import SendInvite
 from reversion import set_user
 from reversion.views import RevisionMixin
 from rules.contrib.views import PermissionRequiredMixin, permission_required
@@ -968,22 +968,7 @@ class EnterInvitationCode(FormView):
 
     def form_valid(self, form):
         code = "".join(form.cleaned_data["code"].split("-"))
-        if (
-            PersonInvitation.objects.filter(key=code).exists()
-            and not PersonInvitation.objects.get(key=code).accepted
-            and not PersonInvitation.objects.get(key=code).key_expired()
-        ):
-            invitation = PersonInvitation.objects.get(key=code)
-            accept_invitation(invitation=invitation, request=request, signal_sender=request.user)
-            return redirect("account_signup")
-        else:
-            messages.error(
-                request,
-                _(
-                    "The entered code is invalid. The invitation"
-                    " is either expired or does not exist."
-                ),
-            )
+        return redirect("accept-invite", code)
 
 
 class GenerateInvitationCode(View):
