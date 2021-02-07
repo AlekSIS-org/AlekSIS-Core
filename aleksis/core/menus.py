@@ -93,7 +93,7 @@ MENUS = {
                 {
                     "name": _("Social accounts"),
                     "url": "socialaccount_connections",
-                    "icon": "globe",
+                    "icon": "public",
                     "validators": [
                         "menu_generator.validators.is_authenticated",
                         "aleksis.core.util.core_helpers.has_person",

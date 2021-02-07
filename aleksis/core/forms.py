@@ -381,7 +381,9 @@ class InvitationCodeForm(forms.Form):
     """Form to enter an invitation code."""
 
     code = forms.CharField(
-        label=_("Invitation code"), help_text=_("Please enter your invitation code."), widget=SplitInput(sizes=(5, 5, 5))
+        label=_("Invitation code"),
+        help_text=_("Please enter your invitation code."),
+        widget=SplitInput(sizes=(5, 5, 5)),
     )
 
 

@@ -323,3 +323,7 @@ rules.add_perm("core.can_register", can_register_predicate)
 # django-invitations
 can_invite_predicate = is_site_preference_set(section="auth", pref="invite_enabled")
 rules.add_perm("core.can_invite", can_invite_predicate)
+
+# Upload and browse files via CKEditor
+upload_files_ckeditor_predicate = has_person & has_global_perm("core.upload_files_ckeditor")
+rules.add_perm("core.upload_files_ckeditor", upload_files_ckeditor_predicate)

@@ -8,8 +8,10 @@ from django.views.i18n import JavaScriptCatalog
 
 import calendarweek.django
 import debug_toolbar
+from ckeditor_uploader import views as ckeditor_uploader_views
 from django_js_reverse.views import urls_js
 from health_check.urls import urlpatterns as health_urls
+from rules.contrib.views import permission_required
 from two_factor.urls import urlpatterns as tf_urls
 
 from . import views
@@ -92,6 +94,16 @@ urlpatterns = [
     path("maintenance-mode/", include("maintenance_mode.urls")),
     path("impersonate/", include("impersonate.urls")),
     path("__i18n__/", include("django.conf.urls.i18n")),
+    path(
+        "ckeditor/upload/",
+        permission_required("core.ckeditor_upload_files")(ckeditor_uploader_views.upload),
+        name="ckeditor_upload",
+    ),
+    path(
+        "ckeditor/browse/",
+        permission_required("core.ckeditor_upload_files")(ckeditor_uploader_views.browse),
+        name="ckeditor_browse",
+    ),
     path("select2/", include("django_select2.urls")),
     path("jsreverse.js", urls_js, name="js_reverse"),
     path("calendarweek_i18n.js", calendarweek.django.i18n_js, name="calendarweek_i18n_js"),
