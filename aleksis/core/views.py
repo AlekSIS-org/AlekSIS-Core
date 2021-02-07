@@ -968,7 +968,7 @@ class EnterInvitationCode(FormView):
 
     def form_valid(self, form):
         code = "".join(form.cleaned_data["code"].split("-"))
-        return redirect("accept-invite", code)
+        return redirect("invitations:accept-invite", code)
 
 
 class GenerateInvitationCode(View):
