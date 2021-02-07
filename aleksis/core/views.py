@@ -976,7 +976,8 @@ class GenerateInvitationCode(View):
 
     def get(self, request):
         length = get_site_preferences()["auth__invite_code_length"]
-        code = generate_random_code(length)
+        packet_size = get_site_preferences()["auth__invite_code_packet_size"]
+        code = generate_random_code(length, packet_size)
 
         PersonInvitation.objects.create(
             email="", inviter=request.user, key=code, sent=timezone.now()

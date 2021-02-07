@@ -407,9 +407,9 @@ def queryset_rules_filter(
     return queryset.filter(pk__in=wanted_objects)
 
 
-def generate_random_code(length) -> str:
+def generate_random_code(length, packet_size) -> str:
     """Generate random code for e.g. invitations."""
-    return get_random_string(5 * length).lower()
+    return get_random_string(packet_size * length).lower()
 
 
 def unread_notifications_badge(request: HttpRequest) -> int:

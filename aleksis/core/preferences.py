@@ -242,6 +242,14 @@ class InviteCodeLength(IntegerPreference):
 
 
 @site_preferences_registry.register
+class InviteCodePacketSize(IntegerPreference):
+    section = auth
+    name = "invite_code_packet_size"
+    default = 5
+    verbose_name = _("Size of packets. (Default 5: abcde)")
+
+
+@site_preferences_registry.register
 class InviteDayExpiry(IntegerPreference):
     section = auth
     name = "invite_day_expiry"
