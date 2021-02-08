@@ -1,0 +1,32 @@
+{% load material_form material_form_internal %}
+{% part bound_field.field %}
+  <div class="row">
+    <div class="input-field col s12{% if widget.attrs.required %} required{% endif %}">
+    <i class="material-icons prefix" id="{{ bound_field.html_name }}_preview" style="color: {% firstof bound_field.value field.widget.attrs.default '' %};">color_lens</i>
+      {% part field prefix %}{% endpart %}{% part field control %}
+        <input
+          type="text"
+          id="{{ bound_field.html_name }}"
+          class="form-control colorfield_field jscolor {% if bound_field.errors %}invalid{% endif %}"
+          name="{{ bound_field.html_name }}"
+          value="{% firstof bound_field.value field.widget.attrs.default '' %}"
+          placeholder="{% firstof bound_field.value field.widget.attrs.default '' %}"
+          data-jscolor="{hash:true,width:225,height:150,format:'{{ field.widget.attrs.format }}',required:{% if field.widget.attrs.required %}true{% else %}false{% endif %},paletteCols:4,paletteHeight:28,palette:'{{ field.widget.attrs.palette|safe }}'}"
+          data-preview="{{ bound_field.html_name }}_preview"
+          {% if field.widget.attrs.required %}required{% endif %}/>
+      {% endpart %}
+      {% part field label %}
+        <label{% attrs bound_field 'label' %}
+          for="{{ bound_field.id_for_label }}"
+          {% if bound_field.value != None and bound_field.value != '' %}class="active"{% endif %}
+        {% endattrs %}>{{ bound_field.label }}</label>
+      {% endpart %}
+      {% part field help_text %}{% if field.help_text %}
+        <div class="help-block">{{ bound_field.help_text|safe }}</div>
+      {% endif %}
+      {% endpart %}{% part field errors %}
+        {% if bound_field.errors %}{% include  'material/field_errors.html' %}{% endif %}
+      {% endpart %}{{ hidden_initial }}
+    </div>
+  </div>
+{% endpart %}

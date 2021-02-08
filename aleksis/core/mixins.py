@@ -5,6 +5,7 @@ from typing import Any, Callable, List, Optional, Tuple, Union
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.views import LoginView, SuccessURLAllowedHostsMixin
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
@@ -413,6 +414,13 @@ class SuccessMessageMixin(ModelFormMixin):
         if self.success_message:
             messages.success(self.request, self.success_message)
         return super().form_valid(form)
+
+
+class SuccessNextMixin(SuccessURLAllowedHostsMixin):
+    redirect_field_name = "next"
+
+    def get_success_url(self) -> str:
+        return LoginView.get_redirect_url(self) or super().get_success_url()
 
 
 class AdvancedCreateView(SuccessMessageMixin, CreateView):

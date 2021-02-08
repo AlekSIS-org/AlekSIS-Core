@@ -689,3 +689,8 @@ main .alert p:first-child, main .alert div:first-child {
 .draggable {
   cursor: grab;
 }
+
+.jscolor {
+  background-color: inherit !important;
+  color: inherit !important;
+}
