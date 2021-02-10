@@ -73,6 +73,18 @@ MENUS = {
                     "validators": ["menu_generator.validators.is_authenticated",],
                 },
                 {
+                    "name": _("Change password"),
+                    "url": "account_change_password",
+                    "icon": "password",
+                    "validators": [
+                        "menu_generator.validators.is_authenticated",
+                        (
+                            "aleksis.core.util.predicates.permission_validator",
+                            "core.can_change_password",
+                        ),
+                    ],
+                },
+                {
                     "name": _("Me"),
                     "url": "person",
                     "icon": "insert_emoticon",

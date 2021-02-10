@@ -320,6 +320,9 @@ can_register_predicate = is_site_preference_set(
 ) & is_site_preference_set(section="auth", pref="signup_open")
 rules.add_perm("core.can_register", can_register_predicate)
 
+can_change_password_predicate = is_site_preference_set(section="auth", pref="allow_password_change")
+rules.add_perm("core.can_change_password", can_change_password_predicate)
+
 # django-invitations
 can_invite_predicate = is_site_preference_set(section="auth", pref="invite_enabled")
 rules.add_perm("core.can_invite", can_invite_predicate)

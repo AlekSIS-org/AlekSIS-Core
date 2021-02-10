@@ -213,6 +213,14 @@ class SchoolNameOfficial(StringPreference):
 
 
 @site_preferences_registry.register
+class AllowPasswordChange(BooleanPreference):
+    section = auth
+    name = "allow_password_change"
+    default = True
+    verbose_name = _("Allow users to change their passwords")
+
+
+@site_preferences_registry.register
 class SignupEnabled(BooleanPreference):
     section = auth
     name = "signup_enabled"
