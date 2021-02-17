@@ -21,7 +21,7 @@ MENUS = {
             ],
         },
         {
-            "name": _("Enter code"),
+            "name": _("Accept invitation"),
             "url": "enter_invitation_code",
             "icon": "card_giftcard",
             "validators": [

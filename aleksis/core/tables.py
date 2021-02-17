@@ -101,7 +101,7 @@ class PersonColumn(tables.Column):
     """Returns person object from given id."""
 
     def render(self, value):
-        return Person.objects.get(id=value)
+        return Person.objects.get(user__id=value)
 
 
 class InvitationCodeColumn(tables.Column):
