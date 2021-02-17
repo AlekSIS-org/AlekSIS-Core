@@ -21,6 +21,7 @@ from .util.sass_helpers import clean_scss
 class CoreConfig(AppConfig):
     name = "aleksis.core"
     verbose_name = "AlekSIS — The Free School Information System"
+    dist_name = "AlekSIS-Core"
 
     urls = {
         "Repository": "https://edugit.org/AlekSIS/official/AlekSIS/",

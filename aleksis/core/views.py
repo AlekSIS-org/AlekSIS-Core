@@ -2,7 +2,6 @@ from textwrap import wrap
 from typing import Any, Dict, Optional, Type
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
@@ -21,6 +20,7 @@ from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 
 import reversion
+from django_celery_results.models import TaskResult
 from django_tables2 import RequestConfig, SingleTableView
 from dynamic_preferences.forms import preference_form_builder
 from guardian.shortcuts import get_objects_for_user
@@ -35,6 +35,7 @@ from rules.contrib.views import PermissionRequiredMixin, permission_required
 
 from aleksis.core.data_checks import DataCheckRegistry, check_data
 
+from .celery import app
 from .filters import GroupFilter, PersonFilter
 from .forms import (
     AnnouncementForm,
@@ -418,17 +419,12 @@ class SystemStatus(PermissionRequiredMixin, MainView):
         status_code = 500 if self.errors else 200
         task_results = []
 
-        if "django_celery_results" in settings.INSTALLED_APPS:
-            from django_celery_results.models import TaskResult  # noqa
-
-            from .celery import app  # noqa
-
-            if app.control.inspect().registered_tasks():
-                job_list = list(app.control.inspect().registered_tasks().values())[0]
-                for job in job_list:
-                    task_results.append(
-                        TaskResult.objects.filter(task_name=job).order_by("date_done").last()
-                    )
+        if app.control.inspect().registered_tasks():
+            job_list = list(app.control.inspect().registered_tasks().values())[0]
+            for job in job_list:
+                task_results.append(
+                    TaskResult.objects.filter(task_name=job).order_by("date_done").last()
+                )
 
         context = {"plugins": self.plugins, "status_code": status_code, "tasks": task_results}
         return self.render_to_response(context, status=status_code)

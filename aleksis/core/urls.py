@@ -15,7 +15,6 @@ from rules.contrib.views import permission_required
 from two_factor.urls import urlpatterns as tf_urls
 
 from . import views
-from .util.core_helpers import is_celery_enabled
 
 urlpatterns = [
     path("", include("django_prometheus.urls")),
@@ -37,6 +36,8 @@ urlpatterns = [
     path("data_management/", views.data_management, name="data_management"),
     path("status/", views.SystemStatus.as_view(), name="system_status"),
     path("", include(tf_urls)),
+    path("celery_progress/", include("celery_progress.urls")),
+    path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("school_terms/", views.SchoolTermListView.as_view(), name="school_terms"),
     path("school_terms/create/", views.SchoolTermCreateView.as_view(), name="create_school_term"),
     path("school_terms/<int:pk>/", views.SchoolTermEditView.as_view(), name="edit_school_term"),
@@ -221,9 +222,6 @@ if hasattr(settings, "TWILIO_ACCOUNT_SID"):
     from two_factor.gateways.twilio.urls import urlpatterns as tf_twilio_urls  # noqa
 
     urlpatterns += [path("", include(tf_twilio_urls))]
-
-if is_celery_enabled():
-    urlpatterns.append(path("celery_progress/", include("celery_progress.urls")))
 
 # Serve javascript-common if in development
 if settings.DEBUG:

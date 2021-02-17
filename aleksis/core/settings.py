@@ -74,12 +74,19 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "django_extensions",
     "guardian",
     "rules.apps.AutodiscoverRulesConfig",
     "haystack",
     "polymorphic",
     "django_global_request",
     "dbbackup",
+    "django_celery_beat",
+    "django_celery_results",
+    "celery_progress",
+    "health_check.contrib.celery",
+    "djcelery_email",
+    "celery_haystack",
     "settings_context_processor",
     "sass_processor",
     "django_any_js",
@@ -194,7 +201,6 @@ DATABASES = {
         "PASSWORD": _settings.get("database.password", None),
         "HOST": _settings.get("database.host", "127.0.0.1"),
         "PORT": _settings.get("database.port", "5432"),
-        "ATOMIC_REQUESTS": True,
         "CONN_MAX_AGE": _settings.get("database.conn_max_age", None),
     }
 }
@@ -561,21 +567,13 @@ if _settings.get("twilio.sid", None):
     TWILIO_TOKEN = _settings.get("twilio.token")
     TWILIO_CALLER_ID = _settings.get("twilio.callerid")
 
-if _settings.get("celery.enabled", False):
-    INSTALLED_APPS += (
-        "django_celery_beat",
-        "django_celery_results",
-        "celery_progress",
-        "health_check.contrib.celery",
-    )
-    CELERY_BROKER_URL = _settings.get("celery.broker", "redis://localhost")
-    CELERY_RESULT_BACKEND = "django-db"
-    CELERY_CACHE_BACKEND = "django-cache"
-    CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_BROKER_URL = _settings.get("celery.broker", "redis://localhost")
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "django-cache"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
-    if _settings.get("celery.email", False):
-        INSTALLED_APPS += ("djcelery_email",)
-        EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"
+if _settings.get("celery.email", False):
+    EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"
 
 PWA_APP_NAME = lazy_preference("general", "title")
 PWA_APP_DESCRIPTION = lazy_preference("general", "description")
@@ -798,11 +796,8 @@ elif HAYSTACK_BACKEND_SHORT == "whoosh":
         },
     }
 
-if _settings.get("celery.enabled", False) and _settings.get("search.celery", True):
-    INSTALLED_APPS.append("celery_haystack")
-    HAYSTACK_SIGNAL_PROCESSOR = "celery_haystack.signals.CelerySignalProcessor"
-else:
-    HAYSTACK_SIGNAL_PROCESSOR = "haystack.signals.RealtimeSignalProcessor"
+HAYSTACK_SIGNAL_PROCESSOR = "celery_haystack.signals.CelerySignalProcessor"
+CELERY_HAYSTACK_IGNORE_RESULT = True
 
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
 

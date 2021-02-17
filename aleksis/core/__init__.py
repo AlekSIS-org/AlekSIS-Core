@@ -7,7 +7,7 @@ except ModuleNotFoundError:
     celery_app = None
 
 try:
-    __version__ = pkg_resources.get_distribution("AlekSIS").version
+    __version__ = pkg_resources.get_distribution("AlekSIS-Core").version
 except Exception:
     __version__ = "unknown"
 

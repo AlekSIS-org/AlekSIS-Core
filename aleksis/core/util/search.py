@@ -1,14 +1,8 @@
-from django.conf import settings
-
+from celery_haystack.indexes import CelerySearchIndex as BaseSearchIndex
 from haystack import indexes
 
 # Not used here, but simplifies imports for apps
 Indexable = indexes.Indexable  # noqa
-
-if settings.HAYSTACK_SIGNAL_PROCESSOR == "celery_haystack.signals.CelerySignalProcessor":
-    from celery_haystack.indexes import CelerySearchIndex as BaseSearchIndex
-else:
-    from haystack.indexes import SearchIndex as BaseSearchIndex
 
 
 class SearchIndex(BaseSearchIndex):
