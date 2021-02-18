@@ -812,4 +812,6 @@ HEALTH_CHECK = {
     "MEMORY_MIN": _settings.get("health.memory_min_mb", 500),
 }
 
+DBBACKUP_SECONDS = _settings.get("backup.seconds", 7200)
+
 PROMETHEUS_EXPORT_MIGRATIONS = False

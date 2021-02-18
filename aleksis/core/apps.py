@@ -53,9 +53,17 @@ class CoreConfig(AppConfig):
 
         self._load_data_checks()
 
-        from .health_checks import DataChecksHealthCheckBackend
+        from .health_checks import (
+            BackupJobHealthCheck,
+            DataChecksHealthCheckBackend,
+            DbBackupAgeHealthCheck,
+            MediaBackupAgeHealthCheck,
+        )
 
         plugin_dir.register(DataChecksHealthCheckBackend)
+        plugin_dir.register(DbBackupAgeHealthCheck)
+        plugin_dir.register(MediaBackupAgeHealthCheck)
+        plugin_dir.register(BackupJobHealthCheck)
 
     @classmethod
     def _load_data_checks(cls):
