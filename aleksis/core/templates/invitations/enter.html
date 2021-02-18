@@ -8,37 +8,37 @@
 {% block no_page_title %}{% endblock %}
 
 {% block extra_head %}
-  {{ form.media }}
+  {{ form.media.css }}
 {% endblock %}
 
 {% block content %}
   <div class="row">
-    <div class="col m1 l2 xl3"></div>
-    <div class="col s12 m10 l8 xl6">
-      <div class="card">
+  <div class="col m1 l2 xl3"></div>
+  <div class="col s12 m10 l8 xl6">
+    <div class="card">
+      <form method="post">
         <div class="card-content">
-          <h4>{% trans "Accept your invitation" %}</h4>
+          <div class="card-title">{% trans "Accept your invitation" %}</div>
           <div class="alert primary">
             <div>
               <i class="material-icons left">info</i>
-                {% blocktrans %}
-                  Please enter your invitation code to register
-                  your new user account:
-                {% endblocktrans %}
+              {% blocktrans %}
+                Please enter your invitation code to register
+                your new user account:
+              {% endblocktrans %}
             </div>
           </div>
-          <form method="post">
-            {% csrf_token %}
-            {% form form=form %}{% endform %}
-            <button type="submit" class="btn green waves-effect waves-light">
-              <i class="material-icons left">card_giftcard</i>
-              {% trans "Accept invite" %}
-            </button>
-          </form>
+          {% csrf_token %}
+          {% form form=form %}{% endform %}
         </div>
-      </div>
+        <div class="card-action-light">
+          <button type="submit" class="btn green waves-effect waves-light">
+            <i class="material-icons left">card_giftcard</i>
+            {% trans "Accept invite" %}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
   {{ form.media.js }}
-
 {% endblock %}
