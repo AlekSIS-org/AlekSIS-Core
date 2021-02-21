@@ -35,7 +35,7 @@ class BaseBackupHealthCheck(BaseHealthCheckBackend):
         storage = get_storage()
         backups = storage.list_backups(content_type=self.content_type)
         if backups:
-            last_backup = storage.list_backups(content_type=self.content_type)[-1]
+            last_backup = backups[-1]
             last_backup_time = dbbackup_utils.filename_to_date(last_backup)
             time_gone_since_backup = last_backup_time - datetime.now()
 
