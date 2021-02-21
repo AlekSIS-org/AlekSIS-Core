@@ -383,12 +383,12 @@ class InvitationCodeForm(forms.Form):
     # Calculate number of fields
     length = get_site_preferences()["auth__invite_code_length"]
     packet_size = get_site_preferences()["auth__invite_code_packet_size"]
-    sizes = (packet_size,) * length
+    blocks = [packet_size,] * length
 
     code = forms.CharField(
         label=_("Invitation code"),
         help_text=_("Please enter your invitation code."),
-        widget=CleaveWidget(sizes=[sizes], delimiter="-"),
+        widget=CleaveWidget(blocks=blocks, delimiter="-", uppercase = True),
     )
 
 
