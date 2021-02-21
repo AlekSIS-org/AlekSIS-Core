@@ -96,9 +96,9 @@ django-model-utils = "^4.0.0"
 bs4 = "^0.0.1"
 django-allauth = "^0.44.0"
 django-invitations = "^1.9.3"
-django-split-input = "^0.2.1"
 django-extensions = "^3.1.1"
 ipython = "^7.20.0"
+django-cleavejs = "^0.1.0"
 
 [tool.poetry.extras]
 ldap = ["django-auth-ldap"]

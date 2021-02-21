@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     "rules.apps.AutodiscoverRulesConfig",
     "haystack",
     "polymorphic",
+    "dj_cleavejs.apps.DjCleaveJSConfig",
     "django_global_request",
     "dbbackup",
     "django_celery_beat",
@@ -438,6 +439,7 @@ MEDIA_ROOT = _settings.get("media.root", os.path.join(BASE_DIR, "media"))
 NODE_MODULES_ROOT = _settings.get("node_modules.root", os.path.join(BASE_DIR, "node_modules"))
 
 YARN_INSTALLED_APPS = [
+    "cleave.js",
     "datatables",
     "jquery",
     "materialize-css",
@@ -450,6 +452,8 @@ YARN_INSTALLED_APPS = [
 ]
 
 merge_app_settings("YARN_INSTALLED_APPS", YARN_INSTALLED_APPS, True)
+
+CLEAVE_JS = "cleave.js/dist/cleave.min.js"
 
 JS_URL = _settings.get("js_assets.url", STATIC_URL)
 JS_ROOT = _settings.get("js_assets.root", NODE_MODULES_ROOT + "/node_modules")
