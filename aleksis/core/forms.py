@@ -428,9 +428,9 @@ class AccountRegisterForm(SignupForm, ExtensibleForm):
 
         self.fields["privacy_policy"] = forms.BooleanField(
             label=_(
-                f"I have read the <a href='{privacy_policy}'>Privacy policy</a>"
-                " and agree with them."
+                f"I have read the Privacy policy and agree with them."
             ),
+            help_text=_("<a href='{privacy_policy}'>Privacy policy</a>"),
             required=True,
         )
 

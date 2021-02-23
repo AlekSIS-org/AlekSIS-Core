@@ -13,6 +13,7 @@
     <div class="col m1 l2 xl3"></div>
     <div class="col s12 m10 l8 xl6">
     <div class="card">
+      <form action="" method="post">
       <div class="card-content"> 
         {% if wizard.steps.current == 'auth' and socialaccount_providers %}
           <div class="card-title">{% trans "Login with username and password" %}</div>
@@ -56,11 +57,11 @@
               These tokens have been generated for you to print and keep safe. Please
               enter one of these backup tokens to login to your account.{% endblocktrans %}
           {% endif %}
+      </p>
       </div>
     {% endif %}
 
 
-    <form action="" method="post">
       {% csrf_token %}
       {% include "two_factor/_wizard_forms.html" %}
 
@@ -82,6 +83,7 @@
           </button>
         </p>
       {% endif %}
+      </div>
       <div class="card-action-light">
         <button type="submit" class="btn green waves-effect waves-light">
           {% trans "Login" %}
@@ -94,6 +96,7 @@
         {% endif %}
       </div>
     </form>
+
   </div>
   
   <div class="card">

@@ -103,7 +103,7 @@ MENUS = {
                     ],
                 },
                 {
-                    "name": _("Social accounts"),
+                    "name": _("Connected accounts"),
                     "url": "socialaccount_connections",
                     "icon": "public",
                     "validators": [
