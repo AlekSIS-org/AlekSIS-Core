@@ -8,12 +8,13 @@ from django.views.i18n import JavaScriptCatalog
 
 import calendarweek.django
 import debug_toolbar
+from ckeditor_uploader import views as ckeditor_uploader_views
 from django_js_reverse.views import urls_js
 from health_check.urls import urlpatterns as health_urls
+from rules.contrib.views import permission_required
 from two_factor.urls import urlpatterns as tf_urls
 
 from . import views
-from .util.core_helpers import is_celery_enabled
 
 urlpatterns = [
     path("", include("django_prometheus.urls")),
@@ -35,6 +36,8 @@ urlpatterns = [
     path("data_management/", views.data_management, name="data_management"),
     path("status/", views.SystemStatus.as_view(), name="system_status"),
     path("", include(tf_urls)),
+    path("celery_progress/", include("celery_progress.urls")),
+    path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("school_terms/", views.SchoolTermListView.as_view(), name="school_terms"),
     path("school_terms/create/", views.SchoolTermCreateView.as_view(), name="create_school_term"),
     path("school_terms/<int:pk>/", views.SchoolTermEditView.as_view(), name="edit_school_term"),
@@ -92,6 +95,16 @@ urlpatterns = [
     path("maintenance-mode/", include("maintenance_mode.urls")),
     path("impersonate/", include("impersonate.urls")),
     path("__i18n__/", include("django.conf.urls.i18n")),
+    path(
+        "ckeditor/upload/",
+        permission_required("core.ckeditor_upload_files")(ckeditor_uploader_views.upload),
+        name="ckeditor_upload",
+    ),
+    path(
+        "ckeditor/browse/",
+        permission_required("core.ckeditor_upload_files")(ckeditor_uploader_views.browse),
+        name="ckeditor_browse",
+    ),
     path("select2/", include("django_select2.urls")),
     path("jsreverse.js", urls_js, name="js_reverse"),
     path("calendarweek_i18n.js", calendarweek.django.i18n_js, name="calendarweek_i18n_js"),
@@ -209,9 +222,6 @@ if hasattr(settings, "TWILIO_ACCOUNT_SID"):
     from two_factor.gateways.twilio.urls import urlpatterns as tf_twilio_urls  # noqa
 
     urlpatterns += [path("", include(tf_twilio_urls))]
-
-if is_celery_enabled():
-    urlpatterns.append(path("celery_progress/", include("celery_progress.urls")))
 
 # Serve javascript-common if in development
 if settings.DEBUG:

@@ -1,31 +1,27 @@
 {% load i18n socialaccount %}
-
+<p>
   {% get_providers as socialaccount_providers %}
   {% if socialaccount_providers %}
     {% for provider in socialaccount_providers %}
       {% if provider.id == "openid" %}
         {% for brand in provider.get_brands %}
-          <li>
             <a title="{{brand.name}}" 
-              class="socialaccount_provider {{provider.id}} {{brand.id}}" 
+              class="socialaccount_provider {{provider.id}} {{brand.id}}
+              btn-large waves-effect waves-light primary-color" 
               href="{% provider_login_url provider.id openid=brand.openid_url process=process %}">
-              {{brand.name}}
+              {% blocktrans with name=brand.name %}
+                Login with {{ name }}
+              {% endblocktrans %}
             </a>
-          </li>
         {% endfor %}
       {% endif %}
-      <li>
-        <a title="{{provider.name}}" class="socialaccount_provider {{provider.id}}" 
+        <a title="{{provider.name}}" class="socialaccount_provider {{provider.id}}
+        btn hundred-percent waves-effect waves-light primary-color" 
           href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">
-          {{provider.name}}
+          {% blocktrans with name=provider.name %}
+            Login with {{ name }}
+          {% endblocktrans %}
         </a>
-      </li>
     {% endfor %}
-  {% else %}
-    <div class="alert warning">
-      <p>
-        <i class="material-icons left">warning</i>
-        {% blocktrans %}Currently there are no providers configured.{% endblocktrans %}
-      </p>
-    </div>
   {% endif %}
+</p>

@@ -74,12 +74,20 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "django_extensions",
     "guardian",
     "rules.apps.AutodiscoverRulesConfig",
     "haystack",
     "polymorphic",
+    "dj_cleavejs.apps.DjCleaveJSConfig",
     "django_global_request",
     "dbbackup",
+    "django_celery_beat",
+    "django_celery_results",
+    "celery_progress",
+    "health_check.contrib.celery",
+    "djcelery_email",
+    "celery_haystack",
     "settings_context_processor",
     "sass_processor",
     "django_any_js",
@@ -117,6 +125,7 @@ INSTALLED_APPS = [
     "material",
     "pwa",
     "ckeditor",
+    "ckeditor_uploader",
     "django_js_reverse",
     "colorfield",
     "django_bleach",
@@ -192,7 +201,6 @@ DATABASES = {
         "PASSWORD": _settings.get("database.password", None),
         "HOST": _settings.get("database.host", "127.0.0.1"),
         "PORT": _settings.get("database.port", "5432"),
-        "ATOMIC_REQUESTS": True,
         "CONN_MAX_AGE": _settings.get("database.conn_max_age", None),
     }
 }
@@ -307,7 +315,7 @@ if _settings.get("ldap.uri", None):
     )
 
     # Enable Django's integration to LDAP
-    AUTHENTICATION_BACKENDS.append("django_auth_ldap.backend.LDAPBackend")
+    AUTHENTICATION_BACKENDS.append("aleksis.core.util.ldap.LDAPBackend")
 
     AUTH_LDAP_SERVER_URI = _settings.get("ldap.uri")
 
@@ -315,6 +323,13 @@ if _settings.get("ldap.uri", None):
     if _settings.get("ldap.bind.dn", None):
         AUTH_LDAP_BIND_DN = _settings.get("ldap.bind.dn")
         AUTH_LDAP_BIND_PASSWORD = _settings.get("ldap.bind.password")
+
+    # Keep local password for users to be required to proveide their old password on change
+    AUTH_LDAP_SET_USABLE_PASSWORD = True
+
+    # Keep bound as the authenticating user
+    # Ensures proper read permissions, and ability to change password without admin
+    AUTH_LDAP_BIND_AS_AUTHENTICATING_USER = True
 
     # The TOML config might contain either one table or an array of tables
     _AUTH_LDAP_USER_SETTINGS = _settings.get("ldap.users.search")
@@ -423,6 +438,7 @@ MEDIA_ROOT = _settings.get("media.root", os.path.join(BASE_DIR, "media"))
 NODE_MODULES_ROOT = _settings.get("node_modules.root", os.path.join(BASE_DIR, "node_modules"))
 
 YARN_INSTALLED_APPS = [
+    "cleave.js",
     "datatables",
     "jquery",
     "materialize-css",
@@ -435,6 +451,8 @@ YARN_INSTALLED_APPS = [
 ]
 
 merge_app_settings("YARN_INSTALLED_APPS", YARN_INSTALLED_APPS, True)
+
+CLEAVE_JS = "cleave.js/dist/cleave.min.js"
 
 JS_URL = _settings.get("js_assets.url", STATIC_URL)
 JS_ROOT = _settings.get("js_assets.root", NODE_MODULES_ROOT + "/node_modules")
@@ -552,21 +570,13 @@ if _settings.get("twilio.sid", None):
     TWILIO_TOKEN = _settings.get("twilio.token")
     TWILIO_CALLER_ID = _settings.get("twilio.callerid")
 
-if _settings.get("celery.enabled", False):
-    INSTALLED_APPS += (
-        "django_celery_beat",
-        "django_celery_results",
-        "celery_progress",
-        "health_check.contrib.celery",
-    )
-    CELERY_BROKER_URL = _settings.get("celery.broker", "redis://localhost")
-    CELERY_RESULT_BACKEND = "django-db"
-    CELERY_CACHE_BACKEND = "django-cache"
-    CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_BROKER_URL = _settings.get("celery.broker", "redis://localhost")
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "django-cache"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
-    if _settings.get("celery.email", False):
-        INSTALLED_APPS += ("djcelery_email",)
-        EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"
+if _settings.get("celery.email", False):
+    EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"
 
 PWA_APP_NAME = lazy_preference("general", "title")
 PWA_APP_DESCRIPTION = lazy_preference("general", "description")
@@ -730,6 +740,9 @@ CKEDITOR_CONFIGS = {
     }
 }
 
+# Upload path for CKEditor. Relative to MEDIA_ROOT.
+CKEDITOR_UPLOAD_PATH = "ckeditor_uploads/"
+
 # Which HTML tags are allowed
 BLEACH_ALLOWED_TAGS = ["p", "b", "i", "u", "em", "strong", "a", "div"]
 
@@ -786,11 +799,8 @@ elif HAYSTACK_BACKEND_SHORT == "whoosh":
         },
     }
 
-if _settings.get("celery.enabled", False) and _settings.get("search.celery", True):
-    INSTALLED_APPS.append("celery_haystack")
-    HAYSTACK_SIGNAL_PROCESSOR = "celery_haystack.signals.CelerySignalProcessor"
-else:
-    HAYSTACK_SIGNAL_PROCESSOR = "haystack.signals.RealtimeSignalProcessor"
+HAYSTACK_SIGNAL_PROCESSOR = "celery_haystack.signals.CelerySignalProcessor"
+CELERY_HAYSTACK_IGNORE_RESULT = True
 
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
 
@@ -800,5 +810,8 @@ HEALTH_CHECK = {
     "DISK_USAGE_MAX": _settings.get("health.disk_usage_max_percent", 90),
     "MEMORY_MIN": _settings.get("health.memory_min_mb", 500),
 }
+
+DBBACKUP_CHECK_SECONDS = _settings.get("backup.database.check_seconds", 7200)
+MEDIABACKUP_CHECK_SECONDS = _settings.get("backup.media.check_seconds", 7200)
 
 PROMETHEUS_EXPORT_MIGRATIONS = False

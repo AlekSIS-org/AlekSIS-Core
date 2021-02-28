@@ -18,11 +18,13 @@
   {% include_css "paper-css" %}
   <link rel="stylesheet" href="{% sass_src 'style.scss' %}"/>
   <link rel="stylesheet" href="{% static "print.css" %}"/>
-
+  {% if landscape %}
+    <link rel="stylesheet" href="{% static 'print_landscape.css' %}"/>
+  {% endif %}
   {% block extra_head %}{% endblock %}
 </head>
 
-<body class="A4 print-body">
+<body class="A4 {% if landscape %}landscape{% endif %} print-body">
 <main class="sheet infinite">
   <div style="margin-top: -10mm;"></div>
 

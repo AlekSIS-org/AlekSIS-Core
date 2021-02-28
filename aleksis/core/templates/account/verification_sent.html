@@ -10,8 +10,10 @@
   <div class="container">
     <div class="card red">
       <div class="card-content white-text">
-        <div class="material-icons small left">error_outline</div>
-        <span class="card-title">{% blocktrans %}Verify your email!{% endblock %}</span>
+        <div class="card-title">
+          <i class="material-icons small left">error_outline</i>
+          {% blocktrans %}Verify your email{% endblock %}
+        </div>
         <p>
           {% blocktrans %}
             This part of the site requires us to verify that you are who you claim to be.

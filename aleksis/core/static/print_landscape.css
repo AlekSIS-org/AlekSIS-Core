@@ -1,0 +1,19 @@
+@page {
+    size: A4 landscape;
+}
+
+header {
+    width: 277mm;
+}
+
+
+.print-layout-table, .print-layout-td {
+    width: 277mm;
+    max-width: 277mm;
+    min-width: 277mm;
+}
+
+
+footer {
+    width: 277mm;
+}

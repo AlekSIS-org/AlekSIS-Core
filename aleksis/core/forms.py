@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm
 from allauth.account.utils import get_user_model, setup_user_email
+from dj_cleavejs import CleaveWidget
 from django_select2.forms import ModelSelect2MultipleWidget, ModelSelect2Widget, Select2Widget
 from dynamic_preferences.forms import PreferenceForm
 from material import Fieldset, Layout, Row
@@ -379,8 +380,15 @@ DashboardWidgetOrderFormSet = forms.formset_factory(
 class InvitationCodeForm(forms.Form):
     """Form to enter an invitation code."""
 
+    # Calculate number of fields
+    length = get_site_preferences()["auth__invite_code_length"]
+    packet_size = get_site_preferences()["auth__invite_code_packet_size"]
+    blocks = [packet_size,] * length
+
     code = forms.CharField(
-        label=_("Invitation code"), help_text=_("Please enter your invitation code.")
+        label=_("Invitation code"),
+        help_text=_("Please enter your invitation code."),
+        widget=CleaveWidget(blocks=blocks, delimiter="-", uppercase = True),
     )
 
 
@@ -419,11 +427,10 @@ class AccountRegisterForm(SignupForm, ExtensibleForm):
         )
 
         self.fields["privacy_policy"] = forms.BooleanField(
-            label=_("Privacy policy"),
-            help_text=_(
-                f"I have read the <a href='{privacy_policy}'>Privacy policy</a>"
-                " and agree with them."
+            label=_(
+                f"I have read the Privacy policy and agree with them."
             ),
+            help_text=_("<a href='{privacy_policy}'>Privacy policy</a>"),
             required=True,
         )
 

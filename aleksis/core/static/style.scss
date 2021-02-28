@@ -385,7 +385,6 @@ span.badge .material-icons {
   color: whitesmoke !important;
 }
 
-
 /* Table*/
 
 table.striped > tbody > tr:nth-child(odd), table tr.striped, table tbody.striped tr {
@@ -685,4 +684,24 @@ main .alert p:first-child, main .alert div:first-child {
 
 .draggable {
   cursor: grab;
+}
+
+.jscolor {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+.card .card-action-light {
+	background-color: inherit;
+	border-top: 1px solid rgba(160, 160, 160, 0.2);
+	position: relative;
+	padding: 16px 24px;
+}
+
+.margin-top {
+  margin-top: 0.7rem !important;
+}
+
+.margin-bottom {
+  margin-bottom: 0.7rem !important;
 }

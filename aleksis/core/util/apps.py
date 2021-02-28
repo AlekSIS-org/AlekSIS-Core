@@ -5,6 +5,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db.models.signals import post_migrate, pre_migrate
 from django.http import HttpRequest
 
+import pkg_resources
 from dynamic_preferences.signals import preference_updated
 from license_expression import Licensing
 from spdx_license_list import LICENSES
@@ -28,21 +29,46 @@ class AppConfig(django.apps.AppConfig):
         # Getting an app ready means it should look at its config once
         self.preference_updated(self)
 
-    @classmethod
-    def get_name(cls):
+    def get_distribution_name(self):
+        """Get pkg_resources distribution name of application package."""
+        if hasattr(self, "dist_name"):
+            return self.dist_name
+        elif self.name.lower().startswith("aleksis.apps."):
+            return self.name.lower().replace("aleksis.apps.", "AlekSIS-App-")
+
+        return None
+
+    def get_distribution(self):
+        """Get pkg_resources distribution of application package."""
+        dist_name = self.get_distribution_name()
+        if dist_name:
+            try:
+                dist = pkg_resources.get_distribution(dist_name)
+            except pkg_resources.DistributionNotFound:
+                return None
+
+            return dist
+
+    def get_name(self):
         """Get name of application package."""
-        return getattr(cls, "verbose_name", cls.name)
-        # TODO Try getting from distribution if not set
+        if hasattr(self, "verbose_name"):
+            return self.verbose_name
+        else:
+            dist_name = self.get_distribution_name()
+            if dist_name:
+                return dist_name
+            return self.name
 
-    @classmethod
-    def get_version(cls):
+    def get_version(self):
         """Get version of application package."""
-        try:
-            from .. import __version__  # noqa
-        except ImportError:
-            __version__ = None
-
-        return getattr(cls, "version", __version__)
+        if hasattr(self, "version"):
+            return self.version
+        else:
+            dist = self.get_distribution()
+            if dist:
+                return dist.version
+            else:
+                return "unknown"
 
     @classmethod
     def get_licence(cls) -> Tuple:

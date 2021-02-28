@@ -21,7 +21,7 @@ MENUS = {
             ],
         },
         {
-            "name": _("Enter code"),
+            "name": _("Accept invitation"),
             "url": "enter_invitation_code",
             "icon": "card_giftcard",
             "validators": [
@@ -73,6 +73,18 @@ MENUS = {
                     "validators": ["menu_generator.validators.is_authenticated",],
                 },
                 {
+                    "name": _("Change password"),
+                    "url": "account_change_password",
+                    "icon": "password",
+                    "validators": [
+                        "menu_generator.validators.is_authenticated",
+                        (
+                            "aleksis.core.util.predicates.permission_validator",
+                            "core.can_change_password",
+                        ),
+                    ],
+                },
+                {
                     "name": _("Me"),
                     "url": "person",
                     "icon": "insert_emoticon",
@@ -91,9 +103,9 @@ MENUS = {
                     ],
                 },
                 {
-                    "name": _("Social accounts"),
+                    "name": _("Connected accounts"),
                     "url": "socialaccount_connections",
-                    "icon": "globe",
+                    "icon": "public",
                     "validators": [
                         "menu_generator.validators.is_authenticated",
                         "aleksis.core.util.core_helpers.has_person",

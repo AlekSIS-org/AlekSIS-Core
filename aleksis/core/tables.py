@@ -1,7 +1,11 @@
+from textwrap import wrap
+
 from django.utils.translation import gettext_lazy as _
 
 import django_tables2 as tables
 from django_tables2.utils import A
+
+from .models import Person
 
 
 class SchoolTermTable(tables.Table):
@@ -97,7 +101,7 @@ class PersonColumn(tables.Column):
     """Returns person object from given id."""
 
     def render(self, value):
-        return Person.objects.get(id=value)
+        return Person.objects.get(user__id=value)
 
 
 class InvitationCodeColumn(tables.Column):

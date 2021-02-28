@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "AlekSIS-Core"
-version = "2.0a4.dev0"
+version = "2.0a5.dev0"
 packages = [
     { include = "aleksis" }
 ]
@@ -68,10 +68,10 @@ html2text = "^2020.0.0"
 django-ckeditor = "^6.0.0"
 django-js-reverse = "^0.9.1"
 calendarweek = "^0.4.3"
-Celery = {version="^5.0.0", optional=true, extras=["django", "redis"]}
-django-celery-results = {version="^2.0.0", optional=true}
-django-celery-beat = {version="^2.0.0", optional=true}
-django-celery-email = {version="^3.0.0", optional=true}
+Celery = {version="^5.0.0", extras=["django", "redis"]}
+django-celery-results = "^2.0.1"
+django-celery-beat = "^2.2.0"
+django-celery-email = "^3.0.0"
 django-jsonstore = "^0.5.0"
 django-polymorphic = "^3.0.0"
 django-colorfield = "^0.3.0"
@@ -80,7 +80,7 @@ django-guardian = "^2.2.0"
 rules = "^2.2"
 django-cache-memoize = "^0.1.6"
 django-haystack = {version="3.0b1", allow-prereleases = true}
-celery-haystack = {version="^0.10.0", optional=true}
+celery-haystack-ng = "^0.20"
 django-dbbackup = "^3.3.0"
 spdx-license-list = "^0.5.0"
 license-expression = "^1.2"
@@ -96,16 +96,18 @@ django-model-utils = "^4.0.0"
 bs4 = "^0.0.1"
 django-allauth = "^0.44.0"
 django-invitations = "^1.9.3"
+django-extensions = "^3.1.1"
+ipython = "^7.20.0"
+django-cleavejs = "^0.1.0"
 
 [tool.poetry.extras]
 ldap = ["django-auth-ldap"]
-celery = ["Celery", "django-celery-results", "django-celery-beat", "django-celery-email", "celery-haystack"]
 
 [tool.poetry.dev-dependencies]
 aleksis-builddeps = "*"
 
 [tool.poetry.scripts]
-aleksis-admin = 'aleksis.core.util.manage:aleksis_cmd'
+aleksis-admin = 'aleksis.core.__main__:aleksis_cmd'
 
 [tool.black]
 line-length = 100

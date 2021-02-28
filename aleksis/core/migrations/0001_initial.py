@@ -26,15 +26,12 @@ class Migration(migrations.Migration):
             name='GlobalPermissions',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('extended_data', django.contrib.postgres.fields.jsonb.JSONField(default=dict, editable=False)),
             ],
             options={
-                'permissions': (('view_system_status', 'Can view system status'), ('link_persons_accounts', 'Can link persons to accounts'), ('manage_data', 'Can manage data'), ('impersonate', 'Can impersonate'), ('search', 'Can use search'), ('change_site_preferences', 'Can change site preferences'), ('change_person_preferences', 'Can change person preferences'), ('change_group_preferences', 'Can change group preferences')),
+                'default_permissions': (),
+                'permissions': (('view_system_status', 'Can view system status'), ('link_persons_accounts', 'Can link persos to accounts'), ('manage_data', 'Can manage data'), ('impersonate', 'Can impersonate'), ('search', 'Can use search'), ('change_site_preferences', 'Can change site preferences'), ('change_person_preferences', 'Can change person preferences'), ('change_group_preferences', 'Can change group preferences')),
                 'managed': False,
             },
-            managers=[
-                ('objects', django.contrib.sites.managers.CurrentSiteManager()),
-            ],
         ),
         migrations.CreateModel(
             name='AdditionalField',

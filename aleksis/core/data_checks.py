@@ -9,7 +9,8 @@ import reversion
 from reversion import set_comment
 from templated_email import send_templated_mail
 
-from .util.core_helpers import celery_optional, get_site_preferences
+from .celery import app
+from .util.core_helpers import get_site_preferences
 
 
 class SolveOption:
@@ -207,7 +208,7 @@ class DataCheckRegistry:
         return [(check.name, check.verbose_name) for check in cls.data_checks]
 
 
-@celery_optional
+@app.task
 def check_data():
     """Execute all registered data checks and send email if activated."""
     for check in DataCheckRegistry.data_checks:

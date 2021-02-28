@@ -91,6 +91,11 @@ $(document).ready(function () {
     // Intialize Tabs [Materialize]
     $('.tabs').tabs();
 
+    // Sync color picker
+    $(".jscolor").change(function () {
+        $("#" + $(this).data("preview")).css("color", $(this).val());
+    });
+
     $('table.datatable').each(function (index) {
         $(this).DataTable({
             "paging": false

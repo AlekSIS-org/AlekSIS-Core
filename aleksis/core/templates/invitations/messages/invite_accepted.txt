@@ -1,0 +1,3 @@
+{% load i18n %}
+
+{% blocktrans %}The invitation for {{ email }} has been accepted.{% endblocktrans %}

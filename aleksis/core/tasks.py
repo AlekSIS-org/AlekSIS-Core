@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.core import management
 
-from .util.core_helpers import celery_optional
+from .celery import app
 from .util.notifications import send_notification as _send_notification
 
 
-@celery_optional
+@app.task
 def send_notification(notification: int, resend: bool = False) -> None:
     """Send a notification object to its recipient.
 
@@ -15,7 +15,7 @@ def send_notification(notification: int, resend: bool = False) -> None:
     _send_notification(notification, resend)
 
 
-@celery_optional
+@app.task
 def backup_data() -> None:
     """Backup database and media using django-dbbackup."""
     # Assemble command-line options for dbbackup management command

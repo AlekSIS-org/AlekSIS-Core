@@ -3,6 +3,7 @@ from django.forms import EmailField, ImageField, URLField
 from django.forms.widgets import SelectMultiple
 from django.utils.translation import gettext_lazy as _
 
+from colorfield.widgets import ColorWidget
 from dynamic_preferences.preferences import Section
 from dynamic_preferences.types import (
     BooleanPreference,
@@ -54,6 +55,7 @@ class ColourPrimary(StringPreference):
     default = "#0d5eaf"
     required = False
     verbose_name = _("Primary colour")
+    widget = ColorWidget
 
 
 @site_preferences_registry.register
@@ -63,6 +65,7 @@ class ColourSecondary(StringPreference):
     default = "#0d5eaf"
     required = False
     verbose_name = _("Secondary colour")
+    widget = ColorWidget
 
 
 @site_preferences_registry.register
@@ -210,6 +213,14 @@ class SchoolNameOfficial(StringPreference):
 
 
 @site_preferences_registry.register
+class AllowPasswordChange(BooleanPreference):
+    section = auth
+    name = "allow_password_change"
+    default = True
+    verbose_name = _("Allow users to change their passwords")
+
+
+@site_preferences_registry.register
 class SignupEnabled(BooleanPreference):
     section = auth
     name = "signup_enabled"
@@ -239,6 +250,14 @@ class InviteCodeLength(IntegerPreference):
     name = "invite_code_length"
     default = 3
     verbose_name = _("Length of invite code. (Default 3: abcde-acbde-abcde)")
+
+
+@site_preferences_registry.register
+class InviteCodePacketSize(IntegerPreference):
+    section = auth
+    name = "invite_code_packet_size"
+    default = 5
+    verbose_name = _("Size of packets. (Default 5: abcde)")
 
 
 @site_preferences_registry.register

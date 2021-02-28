@@ -5,6 +5,7 @@ from typing import Any, Callable, List, Optional, Tuple, Union
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.views import LoginView, SuccessURLAllowedHostsMixin
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
@@ -353,6 +354,17 @@ class PureDjangoModel(object):
     pass
 
 
+class GlobalPermissionModel(models.Model):
+    """Base model for global permissions.
+
+    This base model ensures that global permissions are not managed."""
+
+    class Meta:
+        default_permissions = ()
+        abstract = True
+        managed = False
+
+
 class _ExtensibleFormMetaclass(ModelFormMetaclass):
     def __new__(cls, name, bases, dct):
         x = super().__new__(cls, name, bases, dct)
@@ -413,6 +425,13 @@ class SuccessMessageMixin(ModelFormMixin):
         if self.success_message:
             messages.success(self.request, self.success_message)
         return super().form_valid(form)
+
+
+class SuccessNextMixin(SuccessURLAllowedHostsMixin):
+    redirect_field_name = "next"
+
+    def get_success_url(self) -> str:
+        return LoginView.get_redirect_url(self) or super().get_success_url()
 
 
 class AdvancedCreateView(SuccessMessageMixin, CreateView):

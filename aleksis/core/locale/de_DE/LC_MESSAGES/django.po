@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: AlekSIS (School Information System) 0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-11 21:30+0100\n"
-"PO-Revision-Date: 2021-01-11 20:42+0000\n"
+"PO-Revision-Date: 2021-02-17 12:13+0000\n"
 "Last-Translator: Jonathan Weth <teckids@jonathanweth.de>\n"
 "Language-Team: German <https://translate.edugit.org/projects/aleksis/aleksis/"
 "de/>\n"
@@ -130,7 +130,7 @@ msgstr "Sie benötigen mindestens einen Empfänger."
 
 #: health_checks.py:15
 msgid "There are unresolved data problems."
-msgstr "Es gibt keine ungelösten Datenprobleme."
+msgstr "Es gibt ungelöste Datenprobleme."
 
 #: menus.py:7 templates/two_factor/core/login.html:6
 #: templates/two_factor/core/login.html:10

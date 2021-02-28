@@ -10,8 +10,10 @@
   <div class="container">
     <div class="card green">
       <div class="card-content white-text">
-        <div class="material-icons small left">success</div>
-        <span class="card-title">{% blocktrans %}Password reset mail sent!{% endblock %}</span>
+        <div class="card-title">
+          <i class="material-icons small left">success</i>
+          {% blocktrans %}Password reset mail sent{% endblock %}
+        </div>
         <p>
           {% blocktrans %}
             We have sent you an e-mail. Please contact one of your site
@@ -24,3 +26,4 @@
   </div>
 
 {% endblock %}
+
