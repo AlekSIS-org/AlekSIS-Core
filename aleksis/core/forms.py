@@ -388,7 +388,7 @@ class InvitationCodeForm(forms.Form):
     code = forms.CharField(
         label=_("Invitation code"),
         help_text=_("Please enter your invitation code."),
-        widget=CleaveWidget(blocks=blocks, delimiter="-", uppercase = True),
+        widget=CleaveWidget(blocks=blocks, delimiter="-", uppercase=True),
     )
 
 
@@ -427,10 +427,8 @@ class AccountRegisterForm(SignupForm, ExtensibleForm):
         )
 
         self.fields["privacy_policy"] = forms.BooleanField(
-            label=_(
-                f"I have read the Privacy policy and agree with them."
-            ),
-            help_text=_("<a href='{privacy_policy}'>Privacy policy</a>"),
+            label=_("I have read the Privacy policy and agree with them."),
+            help_text=_(f"<a href='{privacy_policy}'>Privacy policy</a>"),
             required=True,
         )
 
