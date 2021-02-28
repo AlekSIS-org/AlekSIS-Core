@@ -154,8 +154,6 @@ class ExtensibleModel(models.Model, metaclass=_ExtensibleModelBase):
 
     extended_data = JSONField(default=dict, editable=False)
 
-    extended_data = JSONField(default=dict, editable=False)
-
     @classmethod
     def _safe_add(cls, obj: Any, name: Optional[str]) -> None:
         # Decide the name for the attribute
