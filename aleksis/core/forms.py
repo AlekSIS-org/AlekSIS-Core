@@ -1,8 +1,11 @@
 from datetime import datetime, time
+from typing import Callable, Dict, List, Sequence, Tuple
 
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models import QuerySet
+from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from allauth.account.adapter import get_adapter
@@ -461,3 +464,144 @@ class AccountRegisterForm(SignupForm, ExtensibleForm):
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
         return user
+
+
+class ActionForm(forms.Form):
+    """Generic form for executing actions on multiple items of a queryset.
+
+    This should be used together with a ``Table`` from django-tables2
+    which includes a ``SelectColumn``.
+
+    The queryset can be defined in two different ways:
+    You can use ``get_queryset`` or provide ``queryset`` as keyword argument
+    at the initialization of this form class.
+    If both are declared, it will use the keyword argument.
+
+    Any actions can be defined using the ``actions`` class attribute
+    or overriding the method ``get_actions``.
+    The actions use the same syntax like the Django Admin actions with one important difference:
+    Instead of the related model admin,
+    these actions will get the related ``ActionForm`` as first argument.
+    Here you can see an example for such an action:
+
+    .. code-block:: python
+
+        from django.utils.translation import gettext as _
+
+        def example_action(form, request, queryset):
+            # Do something with this queryset
+
+        example_action.short_description = _("Example action")
+
+    If you can include the ``ActionForm`` like any other form in your views,
+    but you must add the request as first argument.
+    When the form is valid, you should run ``execute``:
+
+    .. code-block:: python
+
+        from aleksis.core.forms import ActionForm
+
+        def your_view(request, ...):
+            # Something
+            action_form = ActionForm(request, request.POST or None, ...)
+            if request.method == "POST" and form.is_valid():
+                form.execute()
+
+            # Something
+    """
+
+    layout = Layout("action")
+    actions = []
+
+    def get_actions(self) -> Sequence[Callable]:
+        """Get all defined actions."""
+        return self.actions
+
+    def _get_actions_dict(self) -> Dict[str, Callable]:
+        """Get all defined actions as dictionary."""
+        return {value.__name__: value for value in self.get_actions()}
+
+    def _get_action_choices(self) -> List[Tuple[str, str]]:
+        """Get all defined actions as Django choices."""
+        return [
+            (value.__name__, getattr(value, "short_description", value.__name__))
+            for value in self.get_actions()
+        ]
+
+    def get_queryset(self) -> QuerySet:
+        """Get the related queryset."""
+        raise NotImplementedError("Queryset necessary.")
+
+    action = forms.ChoiceField(choices=[])
+    selected_objects = forms.ModelMultipleChoiceField(queryset=None)
+
+    def __init__(self, request: HttpRequest, *args, queryset: QuerySet = None, **kwargs):
+        self.request = request
+        self.queryset = queryset if isinstance(queryset, QuerySet) else self.get_queryset()
+        super().__init__(*args, **kwargs)
+        self.fields["selected_objects"].queryset = self.queryset
+        self.fields["action"].choices = self._get_action_choices()
+
+    def execute(self) -> bool:
+        """Execute the selected action on all selected objects.
+
+        :return: If the form is not valid, it will return ``False``.
+        """
+        if self.is_valid():
+            data = self.cleaned_data["selected_objects"]
+            action = self._get_actions_dict()[self.cleaned_data["action"]]
+            action(None, self.request, data)
+            return True
+        return False
+
+
+class ListActionForm(ActionForm):
+    """Generic form for executing actions on multiple items of a list of dictionaries.
+
+    Sometimes you want to implement actions for data from different sources
+    than querysets or even querysets from multiple models. For these cases,
+    you can use this form.
+
+    To provide an unique identification of each item, the dictionaries **must**
+    include the attribute ``pk``. This attribute has to be unique for the whole list.
+    If you don't mind this aspect, this will cause unexpected behavior.
+
+    Any actions can be defined as described in ``ActionForm``, but, of course,
+    the last argument won't be a queryset but a list of dictionaries.
+
+    For further information on usage, you can take a look at ``ActionForm``.
+    """
+
+    selected_objects = forms.MultipleChoiceField(choices=[])
+
+    def get_queryset(self):
+        # Return None in order not to raise an unwanted exception
+        return None
+
+    def _get_dict(self) -> Dict[str, dict]:
+        """Get the items sorted by pk attribute."""
+        return {item["pk"]: item for item in self.items}
+
+    def _get_choices(self) -> List[Tuple[str, str]]:
+        """Get the items as Django choices."""
+        return [(item["pk"], item["pk"]) for item in self.items]
+
+    def _get_real_items(self, items: Sequence[dict]) -> List[dict]:
+        """Get the real dictionaries from a list of pks."""
+        items_dict = self._get_dict()
+        real_items = []
+        for item in items:
+            if item not in items_dict:
+                raise ValidationError(_("No valid selection."))
+            real_items.append(items_dict[item])
+        return real_items
+
+    def clean_selected_objects(self) -> List[dict]:
+        data = self.cleaned_data["selected_objects"]
+        items = self._get_real_items(data)
+        return items
+
+    def __init__(self, request: HttpRequest, items, *args, **kwargs):
+        self.items = items
+        super().__init__(request, *args, **kwargs)
+        self.fields["selected_objects"].choices = self._get_choices()

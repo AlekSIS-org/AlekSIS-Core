@@ -36,6 +36,7 @@ Licence
 
 ::
 
+  Copyright © 2021 magicfelix <felix@felix-zauberer.de>
   Copyright © 2017, 2018, 2019, 2020 Jonathan Weth <wethjo@katharineum.de>
   Copyright © 2017, 2018, 2019 Frank Poetzsch-Heffter <p-h@katharineum.de>
   Copyright © 2018, 2019, 2020 Julian Leucker <leuckeju@katharineum.de>

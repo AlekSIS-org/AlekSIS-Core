@@ -21,6 +21,7 @@ from django.views.generic.edit import DeleteView, ModelFormMixin
 
 import reversion
 from guardian.admin import GuardedModelAdmin
+from guardian.core import ObjectPermissionChecker
 from jsonstore.fields import IntegerField, JSONFieldMixin
 from material.base import Layout, LayoutNode
 from rules.contrib.admin import ObjectPermissionsModelAdmin
@@ -331,6 +332,10 @@ class ExtensibleModel(models.Model, metaclass=_ExtensibleModelBase):
     def add_permission(cls, name: str, verbose_name: str):
         """Dynamically add a new permission to a model."""
         cls.extra_permissions.append((name, verbose_name))
+
+    def set_object_permission_checker(self, checker: ObjectPermissionChecker):
+        """Annotate a ``ObjectPermissionChecker`` for use with permission system."""
+        self._permission_checker = checker
 
     def save(self, *args, **kwargs):
         """Ensure all functionality of our extensions that needs saving gets it."""

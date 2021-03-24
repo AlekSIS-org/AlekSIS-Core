@@ -9,7 +9,7 @@ from django.db.models import QuerySet
 from django.forms.models import BaseModelForm, modelform_factory
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
@@ -59,6 +59,7 @@ from .models import (
     DashboardWidget,
     DashboardWidgetOrder,
     DataCheckResult,
+    DummyPerson,
     Group,
     GroupType,
     Notification,
@@ -82,7 +83,7 @@ from .tables import (
 )
 from .util import messages
 from .util.apps import AppConfig
-from .util.core_helpers import generate_random_code, get_site_preferences, objectgetter_optional
+from .util.core_helpers import generate_random_code, has_person, get_site_preferences, objectgetter_optional
 from .util.forms import PreferenceLayout
 
 
@@ -91,18 +92,23 @@ def index(request: HttpRequest) -> HttpResponse:
     """View for dashboard."""
     context = {}
 
-    activities = request.user.person.activities.all()[:5]
-    notifications = request.user.person.notifications.all()[:5]
-    unread_notifications = request.user.person.notifications.all().filter(read=False)
+    if has_person(request.user):
+        person = request.user.person
+        widgets = person.dashboard_widgets
+    else:
+        person = DummyPerson()
+        widgets = []
+
+    activities = person.activities.all()[:5]
+    notifications = person.notifications.all()[:5]
+    unread_notifications = person.notifications.all().filter(read=False)
 
     context["activities"] = activities
     context["notifications"] = notifications
     context["unread_notifications"] = unread_notifications
 
-    announcements = Announcement.objects.at_time().for_person(request.user.person)
+    announcements = Announcement.objects.at_time().for_person(person)
     context["announcements"] = announcements
-
-    widgets = request.user.person.dashboard_widgets
 
     if len(widgets) == 0:
         # Use default dashboard if there are no widgets
@@ -757,17 +763,19 @@ class RunDataChecks(PermissionRequiredMixin, View):
     permission_required = "core.run_data_checks"
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if not check_data()[1]:
-            messages.success(
-                request,
-                _(
-                    "The data check has been started. Please note that it may take "
-                    "a while before you are able to fetch the data on this page."
-                ),
-            )
-        else:
-            messages.success(request, _("The data check has finished."))
-        return redirect("check_data")
+        result = check_data.delay()
+
+        context = {
+            "title": _("Progress: Run data checks"),
+            "back_url": reverse("check_data"),
+            "progress": {
+                "task_id": result.task_id,
+                "title": _("Run data checks …"),
+                "success": _("The data checks were run successfully."),
+                "error": _("There was a problem while running data checks."),
+            },
+        }
+        return render(request, "core/pages/progress.html", context)
 
 
 class SolveDataCheckView(PermissionRequiredMixin, RevisionMixin, DetailView):
@@ -866,8 +874,10 @@ class DashboardWidgetDeleteView(PermissionRequiredMixin, AdvancedDeleteView):
     success_message = _("The dashboard widget has been deleted.")
 
 
-class EditDashboardView(View):
+class EditDashboardView(PermissionRequiredMixin, View):
     """View for editing dashboard widget order."""
+
+    permission_required = "core.edit_dashboard"
 
     def get_context_data(self, request, **kwargs):
         context = {}

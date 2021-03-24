@@ -9,7 +9,7 @@ import reversion
 from reversion import set_comment
 from templated_email import send_templated_mail
 
-from .celery import app
+from .util.celery_progress import ProgressRecorder, recorded_task
 from .util.core_helpers import get_site_preferences
 
 
@@ -208,10 +208,10 @@ class DataCheckRegistry:
         return [(check.name, check.verbose_name) for check in cls.data_checks]
 
 
-@app.task
-def check_data():
+@recorded_task
+def check_data(recorder: ProgressRecorder):
     """Execute all registered data checks and send email if activated."""
-    for check in DataCheckRegistry.data_checks:
+    for check in recorder.iterate(DataCheckRegistry.data_checks):
         logging.info(f"Run check: {check.verbose_name}")
         check.check_data()
 

@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% load i18n static dashboard %}
+{% load i18n static dashboard rules %}
 
 {% block browser_title %}{% blocktrans %}Home{% endblocktrans %}{% endblock %}
 {% block no_page_title %}{% endblock %}
@@ -9,51 +9,54 @@
 {% endblock %}
 
 {% block content %}
-  <a class="btn-flat waves-effect waves-light right" href="{% url "edit_dashboard" %}">
-    <i class="material-icons left">edit</i>
-    {% trans "Edit dashboard" %}
-  </a>
+  {% has_perm "core.edit_dashboard" user as can_edit_dashboard %}
+  {% if can_edit_dashboard %}
+    <a class="btn-flat waves-effect waves-light right" href="{% url "edit_dashboard" %}">
+      <i class="material-icons left">edit</i>
+      {% trans "Edit dashboard" %}
+    </a>
+  {% endif %}
   <h4>
     {{ request.site.preferences.general__title }}
   </h4>
 
-  {% if user.is_authenticated %}
-    {% for notification in unread_notifications %}
-      <div class="alert primary scale-transition">
-        <div>
-          <i class="material-icons left">info</i>
+  {% for notification in unread_notifications %}
+    <div class="alert primary scale-transition">
+      <div>
+        <i class="material-icons left">info</i>
 
-          <div class="right">
-            <a class="btn-flat waves-effect" href="{% url "notification_mark_read" notification.id %}">
-              <i class="material-icons center">close</i>
-            </a>
-          </div>
-
-          <strong>{{ notification.title }}</strong>
-          <p>{{ notification.description }}</p>
+        <div class="right">
+          <a class="btn-flat waves-effect" href="{% url "notification_mark_read" notification.id %}">
+            <i class="material-icons center">close</i>
+          </a>
         </div>
+
+        <strong>{{ notification.title }}</strong>
+        <p>{{ notification.description|linebreaks }}</p>
+      </div>
+    </div>
+  {% endfor %}
+
+  {% include "core/partials/announcements.html" with announcements=announcements %}
+
+  <div class="row" id="live_load">
+    {% for widget in widgets %}
+      <div class="col s{{ widget.size_s }} m{{ widget.size_m }} l{{ widget.size_l }} xl{{ widget.size_xl }}">
+        {% include_widget widget %}
       </div>
     {% endfor %}
+  </div>
 
-    {% include "core/partials/announcements.html" with announcements=announcements %}
-
-    <div class="row" id="live_load">
-      {% for widget in widgets %}
-        <div class="col s{{ widget.size_s }} m{{ widget.size_m }} l{{ widget.size_l }} xl{{ widget.size_xl }}">
-          {% include_widget widget %}
-        </div>
-      {% endfor %}
+  {% if default_dashboard and widgets and can_edit_dashboard %}
+    <div class="grey-text right">
+      {% blocktrans %}
+        You didn't customise your dashboard so that you see the system default. Please click on "Edit dashboard" to
+        customise your personal dashboard.
+      {% endblocktrans %}
     </div>
+  {% endif %}
 
-    {% if default_dashboard and widgets %}
-      <div class="grey-text right">
-        {% blocktrans %}
-          You didn't customise your dashboard so that you see the system default. Please click on "Edit dashboard" to
-          customise your personal dashboard.
-        {% endblocktrans %}
-      </div>
-    {% endif %}
-
+  {% if activities or notifications %}
     <div class="row">
       <div class="col s12 m6">
         <h5>{% blocktrans %}Last activities{% endblocktrans %}</h5>

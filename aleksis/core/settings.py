@@ -12,6 +12,8 @@ from .util.core_helpers import (
     merge_app_settings,
 )
 
+IN_PYTEST = "PYTEST_CURRENT_TEST" in os.environ or "TOX_ENV_DIR" in os.environ
+
 ENVVAR_PREFIX_FOR_DYNACONF = "ALEKSIS"
 DIRS_FOR_DYNACONF = ["/etc/aleksis"]
 
@@ -58,8 +60,14 @@ DEBUG_TOOLBAR_PANELS = [
     "debug_toolbar.panels.signals.SignalsPanel",
     "debug_toolbar.panels.logging.LoggingPanel",
     "debug_toolbar.panels.profiling.ProfilingPanel",
+    "django_uwsgi.panels.UwsgiPanel",
 ]
 
+UWSGI = {
+    "module": "aleksis.core.wsgi",
+}
+UWSGI_SERVE_STATIC = True
+UWSGI_SERVE_MEDIA = True
 
 ALLOWED_HOSTS = _settings.get("http.allowed_hosts", [])
 
@@ -73,6 +81,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "django_uwsgi",
     "django_extensions",
     "guardian",
     "rules.apps.AutodiscoverRulesConfig",
@@ -147,14 +156,14 @@ MIDDLEWARE = [
     "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.http.ConditionalGetMiddleware",
     "django_global_request.middleware.GlobalRequestMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django_otp.middleware.OTPMiddleware",
     "impersonate.middleware.ImpersonateMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -206,18 +215,45 @@ DATABASES = {
 
 merge_app_settings("DATABASES", DATABASES, False)
 
-if _settings.get("caching.memcached.enabled", False):
+REDIS_HOST = _settings.get("redis.host", "localhost")
+REDIS_PORT = _settings.get("redis.port", 6379)
+REDIS_DB = _settings.get("redis.database", 0)
+REDIS_USER = _settings.get("redis.user", "default")
+REDIS_PASSWORD = _settings.get("redis.password", None)
+
+REDIS_URL = (
+    f"redis://{REDIS_USER}{':'+REDIS_PASSWORD if REDIS_PASSWORD else ''}@"
+    f"{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+)
+
+if _settings.get("caching.redis.enabled", not IN_PYTEST):
     CACHES = {
         "default": {
-            "BACKEND": "django_prometheus.cache.backends.memcached.MemcachedCache",
-            "LOCATION": _settings.get("caching.memcached.address", "127.0.0.1:11211"),
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": _settings.get("caching.redis.address", REDIS_URL),
+            "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient",},
         }
     }
-    INSTALLED_APPS.append("cachalot")
-    DEBUG_TOOLBAR_PANELS.append("cachalot.panels.CachalotPanel")
-    CACHALOT_TIMEOUT = _settings.get("caching.cachalot.timeout", None)
-    CACHALOT_DATABASES = set(["default"])
-    SILENCED_SYSTEM_CHECKS.append("cachalot.W001")
+    if REDIS_PASSWORD:
+        CACHES["default"]["OPTIONS"]["PASSWORD"] = REDIS_PASSWORD
+    DJANGO_REDIS_IGNORE_EXCEPTIONS = True
+    DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
+else:
+    CACHES = {
+        "default": {
+            # Use uWSGI if available (will auot-fallback to LocMemCache)
+            "BACKEND": "django_uwsgi.cache.UwsgiCache"
+        }
+    }
+
+INSTALLED_APPS.append("cachalot")
+DEBUG_TOOLBAR_PANELS.append("cachalot.panels.CachalotPanel")
+CACHALOT_TIMEOUT = _settings.get("caching.cachalot.timeout", None)
+CACHALOT_DATABASES = set(["default"])
+SILENCED_SYSTEM_CHECKS.append("cachalot.W001")
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -228,6 +264,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
+
+AUTH_INITIAL_SUPERUSER = {
+    "username": _settings.get("auth.superuser.username", "admin"),
+    "password": _settings.get("auth.superuser.password", "admin"),
+    "email": _settings.get("auth.superuser.email", "root@example.com"),
+}
 
 # Authentication backends are dynamically populated
 AUTHENTICATION_BACKENDS = []
@@ -438,6 +480,7 @@ NODE_MODULES_ROOT = _settings.get("node_modules.root", os.path.join(BASE_DIR, "n
 
 YARN_INSTALLED_APPS = [
     "cleave.js",
+    "@fontsource/roboto",
     "datatables",
     "jquery",
     "materialize-css",
@@ -474,6 +517,7 @@ ANY_JS = {
     },
     "sortablejs": {"js_url": JS_URL + "/sortablejs/Sortable.min.js"},
     "jquery-sortablejs": {"js_url": JS_URL + "/jquery-sortablejs/jquery-sortable.js"},
+    "Roboto": {"css_url": JS_URL + "/@fontsource/roboto/index.css"},
 }
 
 merge_app_settings("ANY_JS", ANY_JS, True)
@@ -521,9 +565,10 @@ MAINTENANCE_MODE_IGNORE_IP_ADDRESSES = _settings.get(
 )
 MAINTENANCE_MODE_GET_CLIENT_IP_ADDRESS = "ipware.ip.get_ip"
 MAINTENANCE_MODE_IGNORE_SUPERUSER = True
-MAINTENANCE_MODE_STATE_FILE_PATH = _settings.get(
+MAINTENANCE_MODE_STATE_FILE_NAME = _settings.get(
     "maintenance.statefile", "maintenance_mode_state.txt"
 )
+MAINTENANCE_MODE_STATE_BACKEND = "maintenance_mode.backends.DefaultStorageBackend"
 
 DBBACKUP_STORAGE = _settings.get("backup.storage", "django.core.files.storage.FileSystemStorage")
 DBBACKUP_STORAGE_OPTIONS = {"location": _settings.get("backup.location", "/var/backups/aleksis")}
@@ -569,13 +614,19 @@ if _settings.get("twilio.sid", None):
     TWILIO_TOKEN = _settings.get("twilio.token")
     TWILIO_CALLER_ID = _settings.get("twilio.callerid")
 
-CELERY_BROKER_URL = _settings.get("celery.broker", "redis://localhost")
+CELERY_BROKER_URL = _settings.get("celery.broker", REDIS_URL)
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "django-cache"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 if _settings.get("celery.email", False):
     EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"
+
+if _settings.get("dev.uwsgi.celery", DEBUG):
+    concurrency = _settings.get("celery.uwsgi.concurrency", 2)
+    UWSGI.setdefault("attach-daemon", [])
+    UWSGI["attach-daemon"].append(f"celery -A aleksis.core worker --concurrency={concurrency}")
+    UWSGI["attach-daemon"].append("celery -A aleksis.core beat")
 
 PWA_APP_NAME = lazy_preference("general", "title")
 PWA_APP_DESCRIPTION = lazy_preference("general", "description")
@@ -814,3 +865,36 @@ DBBACKUP_CHECK_SECONDS = _settings.get("backup.database.check_seconds", 7200)
 MEDIABACKUP_CHECK_SECONDS = _settings.get("backup.media.check_seconds", 7200)
 
 PROMETHEUS_EXPORT_MIGRATIONS = False
+
+if _settings.get("storage.s3.enabled", False):
+    INSTALLED_APPS.append("storages")
+
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+    if _settings.get("storage.s3.static.enabled", False):
+        STATICFILES_STORAGE = "storages.backends.s3boto3.S3StaticStorage"
+        AWS_STORAGE_BUCKET_NAME_STATIC = _settings.get("storage.s3.static.bucket_name", "")
+        AWS_S3_MAX_AGE_SECONDS_CACHED_STATIC = _settings.get(
+            "storage.s3.static.max_age_seconds", 24 * 60 * 60
+        )
+
+    AWS_REGION = _settings.get("storage.s3.region", "")
+    AWS_ACCESS_KEY_ID = _settings.get("storage.s3.access_key_id", "")
+    AWS_SECRET_ACCESS_KEY = _settings.get("storage.s3.secret_key", "")
+    AWS_SESSION_TOKEN = _settings.get("storage.s3.session_token", "")
+    AWS_STORAGE_BUCKET_NAME = _settings.get("storage.s3.bucket_name", "")
+    AWS_S3_ADDRESSING_STYLE = _settings.get("storage.s3.addressing_style", "auto")
+    AWS_S3_ENDPOINT_URL = _settings.get("storage.s3.endpoint_url", "")
+    AWS_S3_KEY_PREFIX = _settings.get("storage.s3.key_prefix", "")
+    AWS_S3_BUCKET_AUTH = _settings.get("storage.s3.bucket_auth", True)
+    AWS_S3_MAX_AGE_SECONDS = _settings.get("storage.s3.max_age_seconds", 24 * 60 * 60)
+    AWS_S3_PUBLIC_URL = _settings.get("storage.s3.public_url", "")
+    AWS_S3_REDUCED_REDUNDANCY = _settings.get("storage.s3.reduced_redundancy", False)
+    AWS_S3_CONTENT_DISPOSITION = _settings.get("storage.s3.content_disposition", "")
+    AWS_S3_CONTENT_LANGUAGE = _settings.get("storage.s3.content_language", "")
+    AWS_S3_METADATA = _settings.get("storage.s3.metadata", {})
+    AWS_S3_ENCRYPT_KEY = _settings.get("storage.s3.encrypt_key", False)
+    AWS_S3_KMS_ENCRYPTION_KEY_ID = _settings.get("storage.s3.kms_encryption_key_id", "")
+    AWS_S3_GZIP = _settings.get("storage.s3.gzip", True)
+    AWS_S3_SIGNATURE_VERSION = _settings.get("storage.s3.signature_version", None)
+    AWS_S3_FILE_OVERWRITE = _settings.get("storage.s3.file_overwrite", False)

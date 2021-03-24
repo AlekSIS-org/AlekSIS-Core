@@ -34,9 +34,9 @@ secondary = true
 
 [tool.poetry.dependencies]
 python = "^3.7"
-Django = "^3.0"
+Django = "^3.1.7"
 django-any-js = "^1.0"
-django-debug-toolbar = "^2.0"
+django-debug-toolbar = "^3.2"
 django-middleware-global-request = "^0.1.2"
 django-menu-generator-ng = "^1.2.0"
 django-tables2 = "^2.1"
@@ -48,10 +48,9 @@ colour = "^0.1.5"
 dynaconf = {version = "^3.1", extras = ["yaml", "toml", "ini"]}
 django-settings-context-processor = "^0.2"
 django-auth-ldap = { version = "^2.2", optional = true }
-django-maintenance-mode = "^0.15.0"
+django-maintenance-mode = "^0.16.0"
 django-ipware = "^3.0"
 django-impersonate = "^1.4"
-python-memcached = "^1.59"
 django-hattori = "^0.2"
 psycopg2 = "^2.8"
 django_select2 = "^7.1"
@@ -74,12 +73,12 @@ django-celery-beat = "^2.2.0"
 django-celery-email = "^3.0.0"
 django-jsonstore = "^0.5.0"
 django-polymorphic = "^3.0.0"
-django-colorfield = "^0.3.0"
+django-colorfield = "^0.4.0"
 django-bleach = "^0.6.1"
 django-guardian = "^2.2.0"
 rules = "^2.2"
 django-cache-memoize = "^0.1.6"
-django-haystack = {version="3.0b1", allow-prereleases = true}
+django-haystack = {version="3.0", allow-prereleases = true}
 celery-haystack-ng = "^0.20"
 django-dbbackup = "^3.3.0"
 spdx-license-list = "^0.5.0"
@@ -99,12 +98,18 @@ django-invitations = "^1.9.3"
 django-extensions = "^3.1.1"
 ipython = "^7.20.0"
 django-cleavejs = "^0.1.0"
+django-uwsgi-ng = "^1.1.0"
+django-redis = "^4.12.1"
+django-storages = {version = "^1.11.1", optional = true}
+boto3 = {version = "^1.17.33", optional = true}
 
 [tool.poetry.extras]
 ldap = ["django-auth-ldap"]
+s3 = ["boto3", "django-storages"]
 
 [tool.poetry.dev-dependencies]
 aleksis-builddeps = "*"
+uwsgi = "^2.0"
 
 [tool.poetry.scripts]
 aleksis-admin = 'aleksis.core.__main__:aleksis_cmd'

@@ -309,3 +309,21 @@ class DataChecksEmailsRecipientGroups(ModelMultipleChoicePreference):
     default = []
     model = Group
     verbose_name = _("Email recipient groups for data checks problem emails")
+
+
+@site_preferences_registry.register
+class AnonymousDashboard(BooleanPreference):
+    section = general
+    name = "anonymous_dashboard"
+    default = False
+    required = False
+    verbose_name = _("Show dashboard to users without login")
+
+
+@site_preferences_registry.register
+class DashboardEditing(BooleanPreference):
+    section = general
+    name = "dashboard_editing"
+    default = True
+    required = False
+    verbose_name = _("Allow users to edit their dashboard")

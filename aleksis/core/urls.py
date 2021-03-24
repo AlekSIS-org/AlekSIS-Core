@@ -1,6 +1,5 @@
 from django.apps import apps
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
@@ -33,6 +32,7 @@ urlpatterns = [
     ),
     path("invitations/", include("invitations.urls")),
     path("admin/", admin.site.urls),
+    path("admin/uwsgi/", include("django_uwsgi.urls")),
     path("data_management/", views.data_management, name="data_management"),
     path("status/", views.SystemStatus.as_view(), name="system_status"),
     path("", include(tf_urls)),
@@ -209,13 +209,6 @@ urlpatterns = [
         name="edit_default_dashboard",
     ),
 ]
-
-# Serve static files from STATIC_ROOT to make it work with runserver
-# collectstatic is also required in development for this
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-# Serve media files from MEDIA_ROOT to make it work with runserver
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Add URLs for optional features
 if hasattr(settings, "TWILIO_ACCOUNT_SID"):

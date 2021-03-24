@@ -271,7 +271,7 @@ class Person(ExtensibleModel):
 
     def save(self, *args, **kwargs):
         # Determine all fields that were changed since last load
-        dirty = bool(self.user_info_tracker.changed())
+        dirty = self.pk is None or bool(self.user_info_tracker.changed())
 
         super().save(*args, **kwargs)
 
@@ -293,9 +293,7 @@ class Person(ExtensibleModel):
         # Ensure we have an admin user
         user = get_user_model()
         if not user.objects.filter(is_superuser=True).exists():
-            admin = user.objects.create_superuser(
-                username="admin", email="root@example.com", password="admin"
-            )
+            admin = user.objects.create_superuser(**settings.AUTH_INITIAL_SUPERUSER)
             admin.save()
 
     def auto_select_primary_group(
@@ -445,12 +443,11 @@ class Group(SchoolTermRelatedExtensibleModel):
 
     def save(self, force: bool = False, *args, **kwargs):
         # Determine state of object in relation to database
-        created = self.pk is None
-        dirty = bool(self.group_info_tracker.changed())
+        dirty = self.pk is None or bool(self.group_info_tracker.changed())
 
         super().save(*args, **kwargs)
 
-        if force or created or dirty:
+        if force or dirty:
             # Synchronise group to Django group with same name
             dj_group, _ = DjangoGroup.objects.get_or_create(name=self.name)
             dj_group.user_set.set(
@@ -801,6 +798,20 @@ class DashboardWidget(PolymorphicModel, PureDjangoModel):
         permissions = (("edit_default_dashboard", _("Can edit default dashboard")),)
         verbose_name = _("Dashboard Widget")
         verbose_name_plural = _("Dashboard Widgets")
+
+
+class ExternalLinkWidget(DashboardWidget):
+    template = "core/dashboard_widget/external_link_widget.html"
+
+    url = models.URLField(verbose_name=_("URL"))
+    icon_url = models.URLField(verbose_name=_("Icon URL"))
+
+    def get_context(self, request):
+        return {"title": self.title, "url": self.url, "icon_url": self.icon_url}
+
+    class Meta:
+        verbose_name = _("External link widget")
+        verbose_name_plural = _("External link widgets")
 
 
 class DashboardWidgetOrder(ExtensibleModel):

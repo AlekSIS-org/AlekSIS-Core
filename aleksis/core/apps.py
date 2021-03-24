@@ -28,6 +28,7 @@ class CoreConfig(AppConfig):
     }
     licence = "EUPL-1.2+"
     copyright_info = (
+        ([2021], "magicfelix", "felix@felix-zauberer.de"),
         ([2017, 2018, 2019, 2020], "Jonathan Weth", "wethjo@katharineum.de"),
         ([2017, 2018, 2019], "Frank Poetzsch-Heffter", "p-h@katharineum.de"),
         ([2018, 2019, 2020], "Julian Leucker", "leuckeju@katharineum.de"),

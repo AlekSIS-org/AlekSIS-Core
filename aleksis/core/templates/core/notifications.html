@@ -16,7 +16,7 @@
             <i class="material-icons left">access_time</i> {{ notification.created }}
           </p>
           <p>
-            {{ notification.description }}
+            {{ notification.description|linebreaks }}
           </p>
           {% if notification.link %}
             <p>

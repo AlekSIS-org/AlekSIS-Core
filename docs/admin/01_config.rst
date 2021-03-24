@@ -38,11 +38,11 @@ A configuration file might look like this::
   password = "SuperSecretPassword"
 
   [caching]
-  memcached = { enabled = true, address = "127.0.0.1" }
+  redis = { enabled = true, address = "127.0.0.1" }
 
 The `secret_key` setting above defines a single value. The following `http`
 section defines a table (cf. a dictionary) in one way, and you can see the
-second form of such a table in the `memcached` setting (we could as well
+second form of such a table in the `redis` setting (we could as well
 have defined another section and placed `enabled` and `address` below it
 as scalars).
 

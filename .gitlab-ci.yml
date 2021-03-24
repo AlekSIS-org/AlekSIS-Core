@@ -10,6 +10,12 @@ include:
     - project: "AlekSIS/official/AlekSIS"
       file: /ci/build/dist.yml
     - project: "AlekSIS/official/AlekSIS"
-      file: /ci/deploy/pages.yml
+      file: /ci/publish/pypi.yml
     - project: "AlekSIS/official/AlekSIS"
-      file: /ci/deploy/pypi.yml
+      file: /ci/docker/image.yml
+    - project: "AlekSIS/official/AlekSIS"
+      file: "/ci/deploy/review.yml"
+    - project: "AlekSIS/official/AlekSIS"
+      file: "/ci/deploy/trigger_dist.yml"
+    - project: "AlekSIS/official/AlekSIS"
+      file: /ci/deploy/pages.yml

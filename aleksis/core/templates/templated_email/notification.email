@@ -30,7 +30,7 @@
 
     <blockquote>
         <h5>{{ notification.title }}</h5>
-        <p>{{ notification.description }}</p>
+        <p>{{ notification.description|linebreaks }}</p>
         {% if notification.link %}
             <a href="{{ notification.link }}">{% trans "More information" %} →</a>
         {% endif %}

@@ -15,7 +15,8 @@ from .util.predicates import (
 rules.add_perm("core", rules.always_allow)
 
 # View dashboard
-rules.add_perm("core.view_dashboard", has_person)
+view_dashboard_predicate = is_site_preference_set("general", "anonymous_dashboard") | has_person
+rules.add_perm("core.view_dashboard", view_dashboard_predicate)
 
 # View notifications
 rules.add_perm("core.view_notifications", has_person)
@@ -310,6 +311,9 @@ rules.add_perm("core.edit_dashboardwidget", edit_dashboard_widget_predicate)
 
 delete_dashboard_widget_predicate = has_person & has_global_perm("core.delete_dashboardwidget")
 rules.add_perm("core.delete_dashboardwidget", delete_dashboard_widget_predicate)
+
+edit_dashboard_predicate = is_site_preference_set("general", "dashboard_editing") & has_person
+rules.add_perm("core.edit_dashboard", edit_dashboard_predicate)
 
 edit_default_dashboard_predicate = has_person & has_global_perm("core.edit_default_dashboard")
 rules.add_perm("core.edit_default_dashboard", edit_default_dashboard_predicate)
