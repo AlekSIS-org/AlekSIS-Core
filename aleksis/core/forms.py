@@ -383,16 +383,19 @@ DashboardWidgetOrderFormSet = forms.formset_factory(
 class InvitationCodeForm(forms.Form):
     """Form to enter an invitation code."""
 
-    # Calculate number of fields
-    length = get_site_preferences()["auth__invite_code_length"]
-    packet_size = get_site_preferences()["auth__invite_code_packet_size"]
-    blocks = [packet_size,] * length
-
     code = forms.CharField(
-        label=_("Invitation code"),
-        help_text=_("Please enter your invitation code."),
-        widget=CleaveWidget(blocks=blocks, delimiter="-", uppercase=True),
+        label=_("Invitation code"), help_text=_("Please enter your invitation code."),
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Calculate number of fields
+        length = get_site_preferences()["auth__invite_code_length"]
+        packet_size = get_site_preferences()["auth__invite_code_packet_size"]
+        blocks = [packet_size,] * length
+
+        self.fields["code"].widget = CleaveWidget(blocks=blocks, delimiter="-", uppercase=True)
 
 
 class AccountRegisterForm(SignupForm, ExtensibleForm):
