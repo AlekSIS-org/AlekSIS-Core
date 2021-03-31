@@ -63,12 +63,7 @@ $(document).ready(function () {
 
     // If JS is activated, the language form will be auto-submitted
     $('.language-field select').change(function () {
-
-        // Ugly bug fix to ensure correct value
-        const selectEl = $("select[name=language]");
-        selectEl.val(selectEl.val());
-
-        $(".language-form").submit();
+        $(this).parents(".language-form").submit();
     });
 
     // If auto-submit is activated (see above), the language submit must not be visible

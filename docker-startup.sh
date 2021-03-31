@@ -52,17 +52,6 @@ prepare_database() {
 	aleksis-admin createinitialrevisions
 }
 
-if [ -z "$ALEKSIS_secret_key" ]; then
-	# Use a random session secret key if none was provided
-	# In K8s, should be provided from a K8s secret
-	if [ ! -e /var/lib/aleksis/secret_key ]; then
-		touch /var/lib/aleksis/secret_key
-		chmod 600 /var/lib/aleksis/secret_key
-		LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' </dev/urandom | head -c 64 >/var/lib/aleksis/secret_key
-	fi
-	ALEKSIS_secret_key=$(cat /var/lib/aleksis/secret_key)
-fi
-
 # Wait for database to be reachable under all conditions
 wait_database
 

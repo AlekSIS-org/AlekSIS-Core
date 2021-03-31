@@ -399,7 +399,7 @@ th.orderable > a {
 }
 
 th.orderable > a::after {
-  @extend i.material-icons;
+  @extend .material-icons;
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;

@@ -13,7 +13,7 @@
   {# Select #}
   <div class="input-field language-field">
     <span>{% trans "Language" %}</span>
-    <select name="language" id="language-select">
+    <select name="language">
       {% for language in languages %}
         <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %}
                 selected {% endif %}>{{ language.name_local }}</option>
