@@ -83,7 +83,12 @@ from .tables import (
 )
 from .util import messages
 from .util.apps import AppConfig
-from .util.core_helpers import generate_random_code, has_person, get_site_preferences, objectgetter_optional
+from .util.core_helpers import (
+    generate_random_code,
+    get_site_preferences,
+    has_person,
+    objectgetter_optional,
+)
 from .util.forms import PreferenceLayout
 
 
