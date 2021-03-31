@@ -23,7 +23,7 @@ MENUS = {
         {
             "name": _("Accept invitation"),
             "url": "enter_invitation_code",
-            "icon": "card_giftcard",
+            "icon": "vpn_key",
             "validators": [
                 "menu_generator.validators.is_anonymous",
                 ("aleksis.core.util.predicates.permission_validator", "core.can_invite"),
