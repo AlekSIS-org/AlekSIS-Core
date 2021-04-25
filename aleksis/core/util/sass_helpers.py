@@ -1,12 +1,8 @@
 """Helpers for SASS/SCSS compilation."""
 
-import os
-from glob import glob
-
-from django.conf import settings
-
 from colour import web2hex
 from sass import SassColor
+from sass_processor.storage import SassFileStorage
 
 from .core_helpers import get_site_preferences
 
@@ -26,9 +22,8 @@ def get_preference(section: str, name: str) -> str:
 
 def clean_scss(*args, **kwargs) -> None:
     """Unlink compiled CSS (i.e. cache invalidation)."""
-    for source_map in glob(os.path.join(settings.STATIC_ROOT, "*.css.map")):
-        try:
-            os.unlink(source_map)
-        except OSError:
-            # Ignore because old is better than nothing
-            pass  # noqa
+    sass_storage = SassFileStorage()
+    __, files = sass_storage.listdir("")
+
+    for source_map in filter(lambda x: x.endswith(".css.map"), files):
+        sass_storage.delete(source_map)

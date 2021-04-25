@@ -1,0 +1,32 @@
+{% load i18n %}
+
+{% block subject %}
+ {% blocktrans with person=person %}{{ person }} changed their data!{% endblocktrans %}
+{% endblock %}
+
+{% block plain %}
+ {% trans "Hello," %}
+
+ {% blocktrans with person=person %}
+   the person {{ person }} recently changed the following fields:
+ {% endblocktrans %}
+
+ {% for field in send_notification_fields %}
+  * {{ field }}
+ {% endfor %}
+{% endblock %}
+
+{% block html %}
+ <p>{% trans "Hello," %}</p>
+ <p>
+  {% blocktrans with person=person %}
+    the person {{ person }} recently changed the following fields:
+  {% endblocktrans %}
+ </p>
+
+ <ul>
+  {% for field in send_notification_fields %}
+   <li>{{ field }}</li>
+  {% endfor %}
+ </ul>
+{% endblock %}

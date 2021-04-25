@@ -1,7 +1,9 @@
 # flake8: noqa: DJ01
 
+import hmac
 from datetime import date, datetime, timedelta
 from typing import Iterable, List, Optional, Sequence, Union
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -908,6 +910,7 @@ class GlobalPermissions(GlobalPermissionModel):
             ("change_site_preferences", _("Can change site preferences")),
             ("change_person_preferences", _("Can change person preferences")),
             ("change_group_preferences", _("Can change group preferences")),
+            ("test_pdf", _("Can test PDF generation")),
         )
 
 
@@ -992,3 +995,49 @@ class PersonInvitation(AbstractBaseInvitation, PureDjangoModel):
     key_expired = Invitation.key_expired
 
     send_invitation = Invitation.send_invitation
+
+
+class PDFFile(ExtensibleModel):
+    """Link to a rendered PDF file."""
+
+    def _get_default_expiration():  # noqa
+        return timezone.now() + timedelta(minutes=get_site_preferences()["general__pdf_expiration"])
+
+    def _get_upload_path(instance, filename):  # noqa
+        return f"pdfs/{instance.secret}.pdf"
+
+    person = models.ForeignKey(
+        to=Person, on_delete=models.CASCADE, verbose_name=_("Owner"), related_name="pdf_files"
+    )
+    expires_at = models.DateTimeField(
+        verbose_name=_("File expires at"), default=_get_default_expiration
+    )
+    html = models.TextField(verbose_name=_("Rendered HTML"))
+    file = models.FileField(
+        upload_to=_get_upload_path, blank=True, null=True, verbose_name=_("Generated PDF file")
+    )
+
+    def __str__(self):
+        return f"{self.person} ({self.pk})"
+
+    @property
+    def secret(self) -> str:
+        """Get secret needed for accessing the HTML page."""
+        return hmac.new(
+            bytes(settings.SECRET_KEY, "utf-8"),
+            msg=bytes(self.html + str(self.expires_at), "utf-8"),
+            digestmod="sha256",
+        ).hexdigest()
+
+    @property
+    def html_url(self) -> str:
+        """Get URL for the HTML page."""
+        return (
+            urlparse(reverse("html_for_pdf_file", args=[self.pk]))
+            ._replace(query=f"secret={self.secret}")
+            .geturl()
+        )
+
+    class Meta:
+        verbose_name = _("PDF file")
+        verbose_name_plural = _("PDF files")

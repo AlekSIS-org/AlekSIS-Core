@@ -1,11 +1,9 @@
-import os
 import sys
 from datetime import datetime, timedelta
 from importlib import import_module
 from itertools import groupby
 from operator import itemgetter
 from typing import Any, Callable, Optional, Sequence, Union
-from uuid import uuid4
 
 if sys.version_info >= (3, 9):
     from importlib import metadata
@@ -182,20 +180,6 @@ def has_person(obj: Union[HttpRequest, Model]) -> bool:
         return False
     else:
         return True
-
-
-def path_and_rename(instance, filename: str, upload_to: str = "files") -> str:
-    """Update path of an uploaded file and renames it to a random UUID in Django FileField."""
-    _, ext = os.path.splitext(filename)
-
-    # set filename as random string
-    new_filename = f"{uuid4().hex}{ext}"
-
-    # Create upload directory if necessary
-    os.makedirs(os.path.join(settings.MEDIA_ROOT, upload_to), exist_ok=True)
-
-    # return the whole path to the file
-    return os.path.join(upload_to, new_filename)
 
 
 def custom_information_processor(request: HttpRequest) -> dict:

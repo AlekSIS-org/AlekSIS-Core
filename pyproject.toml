@@ -34,15 +34,15 @@ secondary = true
 
 [tool.poetry.dependencies]
 python = "^3.7"
-Django = "^3.1.7"
-django-any-js = "^1.0"
+Django = "^3.2"
+django-any-js = "^1.1"
 django-debug-toolbar = "^3.2"
 django-middleware-global-request = "^0.1.2"
 django-menu-generator-ng = "^1.2.3"
 django-tables2 = "^2.1"
 Pillow = "^8.0"
-django-phonenumber-field = {version = "<5.1", extras = ["phonenumbers"]}
-django-sass-processor = "^0.8"
+django-phonenumber-field = {version = "<5.2", extras = ["phonenumbers"]}
+django-sass-processor = "^1.0"
 libsass = "^0.20.0"
 colour = "^0.1.5"
 dynaconf = {version = "^3.1", extras = ["yaml", "toml", "ini"]}
@@ -102,6 +102,7 @@ django-uwsgi-ng = "^1.1.0"
 django-redis = "^4.12.1"
 django-storages = {version = "^1.11.1", optional = true}
 boto3 = {version = "^1.17.33", optional = true}
+django-cleanup = "^5.1.0"
 
 [tool.poetry.extras]
 ldap = ["django-auth-ldap"]

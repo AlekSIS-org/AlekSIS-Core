@@ -131,3 +131,14 @@ def is_notification_recipient(user: User, obj: Model) -> bool:
     notification a user wants to mark read is this user.
     """
     return user == obj.recipient.user
+
+
+def contains_site_preference_value(section: str, pref: str, value: str):
+    """Check if given site preference contains a value."""
+    name = f"check_site_preference_value:{section}__{pref}"
+
+    @predicate(name)
+    def fn() -> bool:
+        return bool(value in get_site_preferences()[f"{section}__{pref}"])
+
+    return fn

@@ -14,6 +14,7 @@ from allauth.account.utils import get_user_model, setup_user_email
 from dj_cleavejs import CleaveWidget
 from django_select2.forms import ModelSelect2MultipleWidget, ModelSelect2Widget, Select2Widget
 from dynamic_preferences.forms import PreferenceForm
+from guardian.core import ObjectPermissionChecker
 from material import Fieldset, Layout, Row
 
 from .mixins import ExtensibleForm, SchoolTermRelatedExtensibleForm
@@ -141,6 +142,22 @@ class EditPersonForm(ExtensibleForm):
     new_user = forms.CharField(
         required=False, label=_("New user"), help_text=_("Create a new account")
     )
+
+    def __init__(self, request: HttpRequest, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Disable non-editable fields
+        person_fields = set([field.name for field in Person.syncable_fields()]).intersection(
+            set(self.fields)
+        )
+
+        if self.instance:
+            checker = ObjectPermissionChecker(request.user)
+            checker.prefetch_perms([self.instance])
+
+            for field in person_fields:
+                if not checker.has_perm(f"core.change_person_field_{field}", self.instance):
+                    self.fields[field].disabled = True
 
     def clean(self) -> None:
         # Use code implemented in dedicated form to verify user selection
@@ -433,8 +450,10 @@ class AccountRegisterForm(SignupForm, ExtensibleForm):
         )
 
         self.fields["privacy_policy"] = forms.BooleanField(
-            label=_("I have read the Privacy policy and agree with them."),
-            help_text=_(f"<a href='{privacy_policy}'>Privacy policy</a>"),
+            help_text=_(
+                f"I have read the <a href='{privacy_policy}'>Privacy policy</a>"
+                " and agree with them."
+            ),
             required=True,
         )
 

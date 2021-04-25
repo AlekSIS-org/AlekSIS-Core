@@ -46,6 +46,12 @@
           <i class="material-icons left">arrow_back</i>
           {% trans "Go back" %}
         </a>
+        {% if additional_button %}
+          <a class="btn waves-effect waves-light" href="{{ additional_button.href }}">
+            <i class="material-icons left">{{ additional_button.icon|default:"" }}</i>
+            {{ additional_button.caption }}
+          </a>
+        {% endif %}
       </div>
     </div>
   </div>

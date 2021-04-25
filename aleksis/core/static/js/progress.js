@@ -47,6 +47,10 @@ function customSuccess(progressBarElement, progressBarMessageElement) {
     $("#result-icon").text("check_circle");
     $("#result-text").text(OPTIONS.success);
     $("#result-box").show();
+    const redirect = "redirect_on_success" in OPTIONS;
+    if (redirect) {
+        window.location.replace(OPTIONS.redirect_on_success);
+    }
 }
 
 function customError(progressBarElement, progressBarMessageElement) {

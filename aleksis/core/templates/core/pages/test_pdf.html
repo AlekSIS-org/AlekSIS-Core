@@ -1,0 +1,19 @@
+{# -*- engine:django -*- #}
+
+{% extends "core/base_print.html" %}
+
+{% load i18n %}
+
+{% block browser_title %}{% blocktrans %}Test PDF generation{% endblocktrans %}{% endblock %}
+{% block page_title %}{% blocktrans %}Test PDF generation{% endblocktrans %}{% endblock %}
+
+{% block content %}
+  <div class="alert primary">
+    <p>
+      <i class="material-icons left">info</i>
+      {% blocktrans %}
+        This simple view can be used to ensure the correct function of the built-in PDF generation system.
+      {% endblocktrans %}
+    </p>
+  </div>
+{% endblock %}

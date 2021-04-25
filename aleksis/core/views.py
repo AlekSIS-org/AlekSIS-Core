@@ -7,15 +7,15 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import QuerySet
 from django.forms.models import BaseModelForm, modelform_factory
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
-from django.views.generic.base import View
-from django.views.generic.detail import DetailView
+from django.views.generic.base import TemplateView, View
+from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 
@@ -32,6 +32,7 @@ from invitations.views import SendInvite
 from reversion import set_user
 from reversion.views import RevisionMixin
 from rules.contrib.views import PermissionRequiredMixin, permission_required
+from templated_email import send_templated_mail
 
 from aleksis.core.data_checks import DataCheckRegistry, check_data
 
@@ -63,6 +64,7 @@ from .models import (
     Group,
     GroupType,
     Notification,
+    PDFFile,
     Person,
     PersonInvitation,
     SchoolTerm,
@@ -90,6 +92,18 @@ from .util.core_helpers import (
     objectgetter_optional,
 )
 from .util.forms import PreferenceLayout
+from .util.pdf import render_pdf
+
+
+class RenderPDFView(TemplateView):
+    """View to render a PDF file from a template.
+
+    Makes use of ``render_pdf``.
+    """
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        context = self.get_context_data(**kwargs)
+        return render_pdf(request, self.template_name, context)
 
 
 @permission_required("core.view_dashboard")
@@ -351,16 +365,39 @@ def edit_person(request: HttpRequest, id_: Optional[int] = None) -> HttpResponse
     if id_:
         # Edit form for existing group
         edit_person_form = EditPersonForm(
-            request.POST or None, request.FILES or None, instance=person
+            request, request.POST or None, request.FILES or None, instance=person
         )
     else:
         # Empty form to create a new group
         if request.user.has_perm("core.create_person"):
-            edit_person_form = EditPersonForm(request.POST or None, request.FILES or None)
+            edit_person_form = EditPersonForm(request, request.POST or None, request.FILES or None)
         else:
             raise PermissionDenied()
     if request.method == "POST":
         if edit_person_form.is_valid():
+            if person and person == request.user.person:
+                # Check if user edited non-editable field
+                notification_fields = get_site_preferences()[
+                    "account__notification_on_person_change"
+                ]
+                send_notification_fields = set(edit_person_form.changed_data).intersection(
+                    set(notification_fields)
+                )
+                context["send_notification_fields"] = send_notification_fields
+                if send_notification_fields:
+                    context["send_notification_fields"] = send_notification_fields
+                    send_templated_mail(
+                        template_name="person_changed",
+                        from_email=request.user.person.mail_sender_via,
+                        headers={
+                            "Reply-To": request.user.person.mail_sender,
+                            "Sender": request.user.person.mail_sender,
+                        },
+                        recipient_list=[
+                            get_site_preferences()["account__person_change_notification_contact"]
+                        ],
+                        context=context,
+                    )
             with reversion.create_revision():
                 set_user(request.user)
                 edit_person_form.save(commit=True)
@@ -439,6 +476,11 @@ class SystemStatus(PermissionRequiredMixin, MainView):
 
         context = {"plugins": self.plugins, "status_code": status_code, "tasks": task_results}
         return self.render_to_response(context, status=status_code)
+
+
+class TestPDFGenerationView(PermissionRequiredMixin, RenderPDFView):
+    template_name = "core/pages/test_pdf.html"
+    permission_required = "core.test_pdf"
 
 
 @permission_required(
@@ -1017,3 +1059,27 @@ class GenerateInvitationCode(View):
         )
 
         return redirect("invite_person")
+
+
+class RedirectToPDFFile(SingleObjectMixin, View):
+    """Redirect to a generated PDF file."""
+
+    model = PDFFile
+
+    def get(self, *args, **kwargs):
+        file_object = self.get_object()
+        if not file_object.file:
+            raise Http404()
+        return redirect(file_object.file.url)
+
+
+class HTMLForPDFFile(SingleObjectMixin, View):
+    """Return rendered HTML for generating a PDF file."""
+
+    model = PDFFile
+
+    def get(self, request, *args, **kwargs):
+        file_object = self.get_object()
+        if request.GET.get("secret") != file_object.secret:
+            raise PermissionDenied()
+        return HttpResponse(file_object.html)

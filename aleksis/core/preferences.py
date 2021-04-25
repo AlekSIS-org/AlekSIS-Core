@@ -327,3 +327,52 @@ class DashboardEditing(BooleanPreference):
     default = True
     required = False
     verbose_name = _("Allow users to edit their dashboard")
+
+
+@site_preferences_registry.register
+class EditableFieldsPerson(MultipleChoicePreference):
+    """Fields on person model that should be editable by the person."""
+
+    section = account
+    name = "editable_fields_person"
+    default = []
+    widget = SelectMultiple
+    verbose_name = _("Fields on person model which are editable by themselves.")
+    field_attribute = {"initial": []}
+    choices = [(field.name, field.name) for field in Person.syncable_fields()]
+
+
+@site_preferences_registry.register
+class SendNotificationOnPersonChange(MultipleChoicePreference):
+    """Fields on the person model that should trigger a notification on change."""
+
+    section = account
+    name = "notification_on_person_change"
+    default = []
+    widget = SelectMultiple
+    verbose_name = _(
+        "Editable fields on person model which should trigger a notification on change"
+    )
+    field_attribute = {"initial": []}
+    choices = [(field.name, field.name) for field in Person.syncable_fields()]
+
+
+@site_preferences_registry.register
+class PersonChangeNotificationContact(StringPreference):
+    """Mail recipient address for change notifications."""
+
+    section = account
+    name = "person_change_notification_contact"
+    default = ""
+    verbose_name = _("Contact for notification if a person changes their data")
+
+
+@site_preferences_registry.register
+class PDFFileExpirationDuration(IntegerPreference):
+    """PDF file expiration duration."""
+
+    section = general
+    name = "pdf_expiration"
+    default = 3
+    verbose_name = _("PDF file expiration duration")
+    help_text = _("in minutes")

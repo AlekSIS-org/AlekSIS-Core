@@ -5,6 +5,7 @@
 @page {
     size: A4;
     padding: 30mm;
+    margin: 0;
 }
 
 header {

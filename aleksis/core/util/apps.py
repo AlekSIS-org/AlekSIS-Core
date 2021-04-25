@@ -186,8 +186,6 @@ class AppConfig(django.apps.AppConfig):
         verbosity: int,
         interactive: bool,
         using: str,
-        plan: List[Tuple],
-        apps: django.apps.registry.Apps,
         **kwargs,
     ) -> None:
         """Call on every app instance after its models have been migrated.
