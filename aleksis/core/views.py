@@ -1006,6 +1006,17 @@ class InvitePerson(PermissionRequiredMixin, SingleTableView, SendInvite):
     table_class = InvitationsTable
     context = {}
 
+    if self.kwargs["id_"]:
+        person = Person.objects.get(self.kwargs["person"])
+        fields = ("person", "email")
+    else:
+        fields = "email"
+
+    def get_initial(self):
+        if person:
+            return {"person": person}
+        return super().get_initial(**kwargs)
+
     def get_context_data(self, **kwargs):
         queryset = kwargs.pop("object_list", None)
         if queryset is None:

@@ -14,6 +14,7 @@
   {% has_perm 'core.change_person_preferences' user person as can_change_person_preferences %}
   {% has_perm 'core.delete_person' user person as can_delete_person %}
   {% has_perm "core.impersonate" user person as can_impersonate %}
+  {% has_perm "core.can_invite" user person as can_invite %}
 
   {% if can_change_person or can_change_person_preferences or can_delete_person or can_impersonate %}
     <p>
@@ -43,7 +44,13 @@
           <i class="material-icons left">portrait</i>
           {% trans "Impersonate" %}
         </a>
-      {% endif %}
+    {% endif %}
+    {% if can_invite and not person.user %}
+        <a href="{% url "invite_person_by_id" person.id %}" class="btn waves-effect waves-light">
+          <i class="material-icons left">giftcard</i>
+          {% trans "Invite user" %}
+        </a>
+    {% endif %}
     </p>
   {% endif %}
 

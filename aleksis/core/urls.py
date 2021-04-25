@@ -48,6 +48,7 @@ urlpatterns = [
     path("person/<int:id_>", views.person, name="person_by_id"),
     path("person/<int:id_>/edit", views.edit_person, name="edit_person_by_id"),
     path("person/<int:id_>/delete", views.delete_person, name="delete_person_by_id"),
+    path("person/<int:id_>/invite", views.InvitePerson.as_view(), name="invite_person_by_id"),
     path("groups", views.groups, name="groups"),
     path("groups/additional_fields", views.additional_fields, name="additional_fields"),
     path("groups/child_groups/", views.groups_child_groups, name="groups_child_groups"),

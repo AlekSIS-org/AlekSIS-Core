@@ -980,6 +980,9 @@ class PersonInvitation(AbstractBaseInvitation, PureDjangoModel):
     """Custom model for invitations to allow to generate invitations codes without email address."""
 
     email = models.EmailField(verbose_name=_("E-Mail address"), blank=True)
+    person = models.ForeignKey(
+        Person, on_delete=models.CASCADE, blank=True, related_name="invitation"
+    )
 
     @classmethod
     def create(cls, email, inviter=None, **kwargs):
@@ -990,7 +993,7 @@ class PersonInvitation(AbstractBaseInvitation, PureDjangoModel):
         return instance
 
     def __str__(self) -> str:
-        return _(f"Invitation: {self.email}")
+        return f"{self.email} ({self.inviter})"
 
     key_expired = Invitation.key_expired
 
