@@ -342,11 +342,11 @@ if _settings.get("oauth2.oidc.enabled", False):
     )
     OAUTH2_PROVIDER["SCOPES"].update(
         {
-            "openid": "OpenID Connect scope",
-            "profile": "Profile scope",
-            "phone": "Phone scope",
-            "email": "Email scope",
-            "address": "Address scope",
+            "openid": _("OpenID Connect scope"),
+            "profile": _("Given name, family name, link to profile and picture if existing."),
+            "address": _("Full home postal address"),
+            "email": _("Email address"),
+            "phone": _("Home and mobile phone"),
         }
     )
 

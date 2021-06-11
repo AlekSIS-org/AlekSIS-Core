@@ -16,7 +16,7 @@
             {% trans "Authorize" %} {{ application.name }}
           </div>
           <p class="margin-bottom">{% trans "The application requests access to the following scopes:" %}</p>
-          {% for scope in scopes %}
+          {% for scope in scopes_descriptions %}
             <p class="margin-bottom">
               <i class="material-icons left">check</i>
               {{ scope }}
