@@ -13,6 +13,8 @@ Changed
 ~~~~~~~
 
 * Add verbose names for all preference sections.
+* Add verbose names for all openid connect scopes and show them in grant
+  view.
 
 Fixed
 ~~~~~
