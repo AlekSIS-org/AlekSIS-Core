@@ -62,7 +62,7 @@ django-maintenance-mode = "^0.16.0"
 django-ipware = "^3.0"
 django-impersonate = "^1.4"
 django-hattori = "^0.2"
-psycopg2 = "^2.8"
+psycopg2 = "^2.9"
 django_select2 = "^7.1"
 django-two-factor-auth = { version = "^1.12.1", extras = [ "yubikey", "phonenumbers", "call", "sms" ] }
 django-yarnpkg = "^6.0"
