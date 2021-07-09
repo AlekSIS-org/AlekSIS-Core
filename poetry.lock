@@ -600,7 +600,7 @@ python-ldap = ">=3.1"
 
 [[package]]
 name = "django-bleach"
-version = "0.6.1"
+version = "0.7.0"
 description = "Easily use bleach with Django models and templates"
 category = "main"
 optional = false
@@ -2690,7 +2690,7 @@ s3 = ["boto3", "django-storages"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "6411aef8264b9c8c32a5ccca65bb4d077cf769c9ddaef4135d5274bbc4052c90"
+content-hash = "02e03433498ab541c37022c3532fa54bd9993be8d4c1e0c849c6eef24fb8c182"
 
 [metadata.files]
 alabaster = [
@@ -2785,6 +2785,7 @@ celery-haystack-ng = [
     {file = "celery_haystack_ng-0.20.post2-py2.py3-none-any.whl", hash = "sha256:a13e00f2c29411b06c6cdf59ad6a90b6c158e3384e7ec6d6d64f6a69e8ff299a"},
 ]
 celery-progress = [
+    {file = "celery-progress-0.1.0.tar.gz", hash = "sha256:60325e0c6733f99a599a911e520c56b87834c397b454531a426079b4e35a8831"},
     {file = "celery_progress-0.1.0-py3-none-any.whl", hash = "sha256:01bc7ecb2483ed7085b957413a392f85b7e1002fc8ce6d24f3d1ff264173002d"},
 ]
 certifi = [
@@ -2980,8 +2981,8 @@ django-auth-ldap = [
     {file = "django_auth_ldap-2.4.0-py3-none-any.whl", hash = "sha256:2d869955da8a0c9a4448671bd9826b9f87458f6a9fc20278e84de8a81200a2be"},
 ]
 django-bleach = [
-    {file = "django-bleach-0.6.1.tar.gz", hash = "sha256:674709c26040618aff0741ce8261fd151e5ead405bd50568c2034662d69daac3"},
-    {file = "django_bleach-0.6.1-py2.py3-none-any.whl", hash = "sha256:59de95cd98f924992313821ab7f94cd64a03aa900ca980bd3b062d8aef1a7954"},
+    {file = "django-bleach-0.7.0.tar.gz", hash = "sha256:f740f4f31b39dd3e2ea4df09f580603ac42b9d5d95f9c1defc51d4fa12c4a598"},
+    {file = "django_bleach-0.7.0-py2.py3-none-any.whl", hash = "sha256:6fc740ebef0c302f6ed1e45f998531177d051635220dfb7b4f30842481a67327"},
 ]
 django-bulk-update = [
     {file = "django-bulk-update-2.2.0.tar.gz", hash = "sha256:5ab7ce8a65eac26d19143cc189c0f041d5c03b9d1b290ca240dc4f3d6aaeb337"},
